@@ -1,0 +1,65 @@
+name: 연계 지도 자동 갱신
+
+on:
+  schedule:
+    - cron: "30 21 * * 1-5"     # 화~토 06:30 (한국 시간), 미장 마감 뒤
+    - cron: "30 9 * * 1-5"      # 월~금 18:30 (한국 시간), 국장 마감·외국인 확정치 뒤
+  workflow_dispatch: {}          # Actions 탭에서 'Run workflow'로 바로 실행
+  push:
+    branches: [main]             # 연계 종목(data/links.csv) 등을 고치면 바로 다시 계산
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 시세 받기와 커플링 계산
+        run: python link_scan.py state
+
+      - name: 데이터 보관
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd state
+          git init -q -b data
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "데이터 갱신 $(date -u +%F)"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" data
+
+      - name: 웹페이지 묶기
+        run: |
+          mkdir -p _site/data
+          cp -r docs/. _site/
+          cp state/link.json _site/data/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

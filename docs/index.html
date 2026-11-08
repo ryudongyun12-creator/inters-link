@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INTERS 미장 → 국장 연계 지도</title>
+<meta name="description" content="S&P 500 종목을 누르면 함께 볼 한국 종목과 실제 커플링 수치가 나오는 지도">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<style>
+:root {
+  --font-anthropic-sans: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-anthropic-serif: var(--font-anthropic-sans);
+  --color-bg: #EEF2F4; --color-panel: #FFFFFF; --color-fg: #14202A; --color-fg-muted: #58697A; --color-border-line: #D5DDE3;
+  --color-ok: #1D7A55; --color-bad: #B2452F;
+  --cds-surface-popover: #F5F8F9; --cds-border: #D5DDE3; --cds-shadow-popover: 0 6px 20px rgba(20, 32, 42, .12); --cds-text-secondary: #58697A;
+  --cds-chart-muted: #B9C3CB;
+  --cds-font-size-title: 30px; --cds-font-size-heading: 18px; --cds-font-size-body: 14.5px; --cds-font-size-caption: 12.5px;
+  --cds-font-weight-medium: 650;
+  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 16px; --cds-gap-lg: 26px;
+  --cds-pad-xs: 6px; --cds-pad-sm: 10px; --cds-pad-lg: 20px; --cds-radius: 12px; --cds-dur-slow: .3s;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0D1418; --color-panel: #141D23; --color-fg: #E1E8ED; --color-fg-muted: #8A9AA8; --color-border-line: #25323B;
+    --color-ok: #47BD8A; --color-bad: #E07A63;
+    --cds-surface-popover: #1B262E; --cds-border: #2C3A44; --cds-shadow-popover: 0 6px 20px rgba(0, 0, 0, .45); --cds-text-secondary: #8A9AA8;
+    --cds-chart-muted: #3A4852;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--color-bg); color: var(--color-fg); font-family: var(--font-anthropic-sans); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+.lk-wrap { max-width: 1320px; margin: 0 auto; padding: 28px 20px 56px; }
+.lk-title { font-weight: 800 !important; letter-spacing: -0.025em; }
+.dash-skeleton { background: linear-gradient(90deg, var(--color-panel), var(--cds-surface-popover), var(--color-panel)); border-radius: var(--cds-radius); }
+.lk-foot { margin-top: var(--cds-gap-md); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.lk-idx { display: inline-flex; border: 1px solid var(--color-border-line); border-radius: 8px; overflow: hidden; margin-left: auto; }
+.lk-idx button { border: 0; background: transparent; color: var(--color-fg); font: inherit; font-size: var(--cds-font-size-caption); font-weight: 600; padding: 6px 14px; cursor: pointer; }
+.lk-idx button[aria-pressed="true"] { background: var(--color-fg); color: var(--color-panel); }
+.lk-maphead { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+.lk-share { border: 1px solid var(--color-border-line); background: var(--color-panel); color: var(--color-fg); font: inherit; font-size: var(--cds-font-size-caption); padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+.lk-msg { margin-top: var(--cds-gap-md); padding: 14px 16px; border-radius: 10px; background: var(--color-panel); border: 1px solid var(--color-border-line); }
+@media (max-width: 640px) { :root { --cds-font-size-title: 24px; } .lk-wrap { padding: 20px 12px 40px; } }
+</style>
+<style>
+.lk { display: grid; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); container-type: inline-size; }
+.lk-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; }
+.lk-take { margin: var(--cds-gap-xs) 0 0; font-size: var(--cds-font-size-body); max-width: 78ch; }
+.lk .lk-take b, .lk .lk-guide b { font-weight: 600; }
+.lk-grid { display: grid; gap: var(--cds-gap-md); grid-template-columns: minmax(0, 1fr); }
+.lk-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+.lk-h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.lk-note { margin: var(--cds-gap-xs) 0 var(--cds-gap-md); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.lk-legend { display: flex; align-items: center; gap: var(--cds-gap-sm); margin-bottom: var(--cds-gap-sm); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; min-height: 1.25rem; }
+.lk-legend svg { display: block; }
+.lk-tools { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; justify-content: space-between; margin-bottom: var(--cds-gap-sm); }
+.lk-search { font: inherit; font-size: var(--cds-font-size-body); padding: var(--cds-pad-xs) var(--cds-pad-sm); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-bg); color: var(--color-fg); width: min(100%, 16rem); }
+.lk-map { position: relative; min-height: 600px; }
+#map-ndx-chart { min-height: 460px; }
+.lk-map svg { display: block; }
+.lk-tile { cursor: pointer; outline: none; }
+.lk-tile rect { stroke: var(--color-panel); stroke-width: 1; }
+.lk-tile:hover rect, .lk-tile:focus-visible rect { stroke: var(--color-fg); stroke-width: 1.5; }
+.lk-tile.is-sel rect { stroke: var(--color-fg); stroke-width: 3; }
+.lk-sec-box { fill: none; stroke: var(--color-border-line); }
+.lk-tile text, .lk-grp text { pointer-events: none; font-variant-numeric: tabular-nums; }
+.lk-tip { position: absolute; z-index: 2; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); max-width: 16rem; }
+.lk-tip .lk-tip-sub { color: var(--cds-text-secondary); }
+.lk-tip b { font-weight: 600; }
+.lk-fail { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.lk-fail::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+.lk-pick { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--cds-gap-sm); margin-top: var(--cds-gap-sm); }
+.lk-pick-t { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); }
+.lk-chg { font-variant-numeric: tabular-nums; font-weight: 600; }
+.lk .up { color: var(--color-ok); }
+.lk .down { color: var(--color-bad); }
+.lk-reason { margin: 0 0 var(--cds-gap-md); padding-left: var(--cds-pad-sm); border-left: 3px solid var(--color-border-line); font-size: var(--cds-font-size-body); }
+.lk-src { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.lk-tablebox { max-height: 30rem; overflow: auto; }
+.lk-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-body); }
+.lk-table th { position: sticky; top: 0; z-index: 1; background: var(--color-panel); text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.lk-table td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+.lk-table .lk-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lk-kr { font-weight: 600; white-space: nowrap; }
+.lk-rel { white-space: nowrap; }
+.lk-badge { display: inline-block; white-space: nowrap; font-size: var(--cds-font-size-caption); font-weight: 600; line-height: 1.4; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--color-ok); }
+.lk-rel-5 { background: var(--color-ok); color: var(--color-bg); }
+.lk-rel-4 { background: color-mix(in srgb, var(--color-ok) 62%, var(--color-panel)); color: var(--color-bg); }
+.lk-rel-3 { background: color-mix(in srgb, var(--color-ok) 38%, var(--color-panel)); color: var(--color-fg); }
+.lk-rel-2 { background: color-mix(in srgb, var(--color-ok) 22%, var(--color-panel)); color: var(--color-fg); }
+.lk-rel-1 { background: color-mix(in srgb, var(--color-ok) 10%, var(--color-panel)); color: var(--color-fg); }
+.lk-rel-0 { background: transparent; color: var(--color-fg-muted); border-color: var(--color-border-line); font-weight: 400; }
+.lk-cpl { display: inline-block; min-width: 3.2em; text-align: right; padding: 1px 6px; border-radius: 4px; font-variant-numeric: tabular-nums; }
+.lk-cpl.c3 { background: var(--color-ok); color: var(--color-bg); font-weight: 600; }
+.lk-cpl.c2 { background: color-mix(in srgb, var(--color-ok) 45%, var(--color-panel)); color: var(--color-fg); }
+.lk-cpl.c1 { background: color-mix(in srgb, var(--color-ok) 15%, var(--color-panel)); color: var(--color-fg); }
+.lk-cpl.c0 { background: color-mix(in srgb, var(--color-bad) 18%, var(--color-panel)); color: var(--color-fg); }
+.lk-cpl.na { color: var(--color-fg-muted); }
+.lk-sub { margin: var(--cds-gap-xs) 0 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.lk-h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: var(--cds-gap-lg) 0 0; }
+.lk-cards { display: grid; align-items: start; gap: var(--cds-gap-sm); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.lk-reco-card { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 2px; border: 1px solid var(--color-border-line); border-left: 4px solid var(--color-ok); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-lg) var(--cds-pad-sm) var(--cds-pad-sm); cursor: pointer; background: var(--color-panel); text-align: left; font: inherit; color: inherit; width: 100%; }
+.lk-reco-card:hover, .lk-reco-card:focus-visible { border-color: var(--color-fg); }
+.lk-reco-card.is-down { border-left-color: var(--color-bad); }
+.lk-reco-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--cds-gap-sm); }
+.lk-reco-name { font-weight: 700; font-size: var(--cds-font-size-heading); }
+.lk-reco-rank { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.lk-reco-stats { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs) var(--cds-gap-md); margin: var(--cds-gap-xs) 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.lk-reco-stats b { color: var(--color-fg); font-weight: 600; }
+.lk-reco-why { font-size: var(--cds-font-size-caption); margin: var(--cds-gap-xs) 0; }
+.lk-reco-picks { display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--cds-gap-xs); }
+.lk-fbadge { display: inline-block; margin-left: 6px; font-size: var(--cds-font-size-caption); font-weight: 600; padding: 1px 7px; border-radius: 999px; background: var(--color-ok); color: var(--color-bg); vertical-align: 2px; }
+.lk-fbadge.is-sell { background: var(--color-bad); }
+.lk-pick-chip { font-size: var(--cds-font-size-caption); padding: 2px 8px; border-radius: 999px; background: var(--cds-surface-popover); border: 1px solid var(--color-border-line); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lk-scale { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cds-gap-xs); margin: 0 0 var(--cds-gap-sm); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.lk-basis { color: var(--color-fg-muted); }
+.lk-basis { white-space: nowrap; font-size: var(--cds-font-size-caption); }
+.lk-themes tbody tr { cursor: pointer; }
+.lk-themes tbody tr:hover td { background: var(--cds-surface-popover); }
+.lk-themes tbody tr.is-sel td { box-shadow: inset 0 -2px 0 var(--color-fg); }
+.lk-reason-cell { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); min-width: 14rem; }
+.lk-guide ul { margin: var(--cds-gap-sm) 0; padding-left: 1.2rem; }
+.lk-guide li { margin: var(--cds-gap-xs) 0; font-size: var(--cds-font-size-body); }
+[data-dash-source-state=empty] { color: transparent; }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+</style>
+</head>
+<body>
+<div class="lk-wrap">
+
+
+<div class="lk">
+  <header id="top">
+    <h1 class="lk-title">미장 → 국장 연계 지도</h1>
+    <p class="lk-take">기준 미장 <b data-draw="us-date" data-source="meta" data-field="us_date">—</b>(현지) 마감, 대상 국장 <b data-draw="next-kr-date" data-source="meta" data-field="next_kr_date">—</b>. 미장에서 가장 강했던 연계 섹터는 <b data-draw="top-theme" data-source="theme_summary" data-field="theme">—</b>(미국 종목 평균 <b data-draw="top-avg" data-source="theme_summary" data-field="avg_change">—</b>), 가장 약했던 섹터는 <b data-draw="low-theme" data-source="theme_summary" data-field="theme">—</b>(<b data-draw="low-avg" data-source="theme_summary" data-field="avg_change">—</b>)입니다.</p>
+    <p class="lk-sub">미장이 마감할 때마다 화면 전체가 그 미장 기준으로 새로 바뀝니다. 국장 마감 뒤에는 그날 결과가 60일 상관계수와 외국인 연동에만 반영됩니다. 외국인 순매수는 <b data-draw="flow-date" data-source="meta" data-field="flow_date">—</b> 한국 마감까지입니다.</p>
+  </header>
+
+  <section class="lk-card" id="reco">
+    <h2 class="lk-h2">국장 추천 테마</h2>
+    <p class="lk-note">미장에서 평균 <b data-draw="th-reco-us">—</b> 이상 오른 연계 섹터 중 한국 종목과의 연동(상관계수 상위 5개 평균)이 <b data-draw="th-reco-corr">—</b> 이상인 곳을, 미국 평균 등락 × 연동 점수 순으로 골랐습니다. 종목은 상관계수 <b data-draw="th-pick-corr">—</b> 이상인 한국 종목 중 예상 반응이 큰 순서입니다. <span class="lk-fbadge">외국인 확인</span> 표시는 미장이 오른 다음 날 외국인이 그 종목들을 사 온 경향(외국인 연동 <b data-draw="th-f-corr">—</b> 이상)이 있고 최근 5일 외국인도 순매수인 테마입니다. 카드를 누르면 그 섹터에서 가장 많이 움직인 미국 종목의 연계 표가 열립니다.</p>
+    <div class="lk-cards" data-draw="reco-up" data-source="theme_reco"></div>
+    <p class="lk-note lk-reco-empty" hidden>오늘은 기준을 넘는 추천 테마가 없습니다.</p>
+    <h3 class="lk-h3">약세 주의 테마</h3>
+    <p class="lk-note">미장에서 평균 <b data-draw="th-reco-us-neg">—</b> 이하로 빠졌고 연동이 높은 섹터입니다. 국장에서도 약할 가능성이 높습니다. <span class="lk-fbadge is-sell">외국인 매도 확인</span> 표시는 외국인 연동이 높고 최근 5일 외국인도 순매도인 테마입니다.</p>
+    <div class="lk-cards" data-draw="reco-down" data-source="theme_reco"></div>
+    <p class="lk-note lk-reco-empty-down" hidden>오늘은 기준을 넘는 약세 주의 테마가 없습니다.</p>
+    <span data-draw="reco-switch"></span>
+  </section>
+
+  <div class="lk-grid">
+    <section class="lk-card" id="map">
+      <h2 class="lk-h2">S&amp;P 500 연계 지도</h2>
+      <p class="lk-note">S&amp;P 500 전 종목을 섹터별로 묶고 지수 비중만큼 크게 그렸습니다. 색은 <span data-draw="src-name" data-source="meta" data-field="price_source">—</span> 종가로 계산한 <b data-draw="us-date-2" data-source="meta" data-field="us_date">—</b> 미국 마감 등락률이며, 전체 <b data-draw="cov-sp-total" data-source="coverage" data-field="total">—</b>개 중 <b data-draw="cov-sp-shown" data-source="coverage" data-field="shown">—</b>개에 시세가 있습니다.</p>
+      <div class="lk-tools">
+        <div class="lk-legend" data-draw="legend">—</div>
+        <input class="lk-search" type="search" list="lk-tickers" placeholder="티커나 회사 이름으로 찾기" aria-label="종목 찾기">
+        <datalist id="lk-tickers" data-draw="tickers" data-source="us_moves"></datalist>
+      </div>
+      <div class="lk-map dash-skeleton" id="map-chart" data-draw="map-sp" data-source="us_moves theme_summary kr_links"></div>
+    </section>
+
+    <section class="lk-card" id="map-ndx">
+      <h2 class="lk-h2">나스닥 100 연계 지도</h2>
+      <p class="lk-note">나스닥 100 전 종목을 섹터별로 묶고 시가총액만큼 크게 그렸습니다. 색은 <b data-draw="us-date-3" data-source="meta" data-field="us_date">—</b> 미국 마감 등락률입니다. 스페이스X, ASML, Arm, 코어위브처럼 S&amp;P 500에 없는 종목도 들어 있습니다. 전체 <b data-draw="cov-ndx-total" data-source="coverage" data-field="total">—</b>개 중 <b data-draw="cov-ndx-shown" data-source="coverage" data-field="shown">—</b>개에 시세가 있습니다.</p>
+      <div class="lk-map dash-skeleton" id="map-ndx-chart" data-draw="map-ndx" data-source="us_moves theme_summary kr_links"></div>
+    </section>
+    <section class="lk-card" id="links">
+      <h2 class="lk-h2">함께 볼 한국 종목</h2>
+      <div class="lk-pick">
+        <span class="lk-pick-t" data-draw="sel-ticker" data-source="us_moves" data-field="ticker">—</span>
+        <span data-draw="sel-name" data-source="us_moves" data-field="company">—</span>
+        <span class="lk-chg" data-draw="sel-change" data-source="us_moves" data-field="change_pct">—</span>
+      </div>
+      <p class="lk-note"><span data-draw="sel-sector" data-source="us_moves" data-field="sector">—</span> / <span data-draw="sel-sub" data-source="us_moves" data-field="sub_industry">—</span>, S&amp;P 500 비중 <span data-draw="sel-weight" data-source="us_moves" data-field="weight">—</span>, 나스닥 100 시가총액 <span data-draw="sel-cap" data-source="us_moves" data-field="ndx_cap">—</span><br>연계 섹터 <span data-draw="sel-theme" data-source="us_moves" data-field="theme">—</span>, 등락률 출처 <span data-draw="sel-src" data-source="us_moves" data-field="value_source">—</span></p>
+      <span data-draw="reason-switch"></span>
+      <p class="lk-reason" hidden><span data-draw="sel-reason" data-source="themes" data-field="reason">—</span> <span class="lk-src">출처 <span data-draw="sel-reason-src" data-source="themes" data-field="reason_source">—</span></span></p>
+      <p class="lk-note lk-noreason" hidden>이 섹터는 그날 따로 확인한 재료가 없습니다.</p>
+      <p class="lk-note">예상 반응은 반응 배율 × 기준 미장 등락률로 계산한 <b data-draw="next-kr-date-2" data-source="meta" data-field="next_kr_date">—</b> 국장 참고치입니다. 상관계수·방향 일치율·반응 배율은 미국 종목의 하루 움직임과 다음 한국 거래일 움직임을 최근 미국 거래일 <b data-draw="win-days" data-source="meta" data-field="window_days">—</b>일 동안 비교한 실측치입니다. 상관계수 칸 색: <span class="lk-cpl c3">강함</span> <b data-draw="cpl-strong">—</b> 이상, <span class="lk-cpl c2">보통</span> <b data-draw="cpl-mid">—</b> 이상, <span class="lk-cpl c1">약함</span> 그 아래, <span class="lk-cpl c0">반대</span> 0 미만.</p>
+      <div class="lk-scale" aria-label="연계 강도">연계 강도 강함 <span class="lk-badge lk-rel-5">공급망</span><span class="lk-badge lk-rel-4">업황 공유</span><span class="lk-badge lk-rel-3">투자 수혜</span><span class="lk-badge lk-rel-2">정책·테마</span><span class="lk-badge lk-rel-1">판매 채널</span><span class="lk-badge lk-rel-0">같은 섹터</span> 약함</div>
+      <div class="lk-tablebox">
+        <table class="lk-table" id="links-table" data-source="kr_links" data-row-key="link_id">
+          <thead><tr><th data-field="kr_name">한국 종목</th><th data-field="relation">연계 방식</th><th data-field="expected_pct" class="lk-num">예상 반응(<span data-draw="next-kr-short" data-source="meta" data-field="next_kr_date">—</span>)</th><th data-field="corr" class="lk-num">상관계수</th><th data-field="hit_rate" class="lk-num">방향 일치율</th><th data-field="beta" class="lk-num">반응 배율</th><th data-field="f_corr" class="lk-num">외국인 연동</th><th data-field="f_net_5d" class="lk-num">외국인 5일(억원)</th><th data-field="note">설명</th><th data-field="basis">근거</th></tr></thead>
+          <tbody data-draw="links"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section class="lk-card" id="check">
+    <h2 class="lk-h2">연계 방식별 실제 커플링</h2>
+    <p class="lk-note">연계 방식마다 측정한 종목 쌍들의 평균입니다. 60일 동안 다음 날 한국 움직임과 가장 잘 맞았던 방식은 <b data-draw="best-rel" data-source="relation_check" data-field="relation">—</b>(평균 상관계수 <b data-draw="best-rel-corr" data-source="relation_check" data-field="avg_corr">—</b>)입니다. 공급망처럼 사업 관계가 깊어도 주가가 하루 단위로 따라 움직인다는 뜻은 아니라서, 색은 연계 방식이 아니라 아래 실측치로 판단하는 편이 정확합니다.</p>
+    <div class="lk-tablebox">
+      <table class="lk-table" id="check-table" data-source="relation_check" data-row-key="relation">
+        <thead><tr><th data-field="relation">연계 방식</th><th data-field="n_pairs" class="lk-num">측정한 쌍</th><th data-field="avg_corr" class="lk-num">평균 상관계수</th><th data-field="avg_hit" class="lk-num">평균 방향 일치율</th><th data-field="avg_beta" class="lk-num">평균 반응 배율</th></tr></thead>
+        <tbody data-draw="check-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="lk-card" id="themes">
+    <h2 class="lk-h2">연계 섹터 흐름</h2>
+    <p class="lk-note">연계 섹터마다 등락률이 보이는 미국 종목만 단순 평균했습니다. 평균 <b data-draw="th-up">—</b> 이상은 강세 예상, <b data-draw="th-down">—</b> 이하는 약세 예상으로 표시한 참고용이며 실제 국장 흐름과는 다를 수 있습니다. 행을 누르면 그 섹터에서 가장 많이 오른 미국 종목이 선택됩니다.</p>
+    <div class="lk-tablebox">
+      <table class="lk-table lk-themes" id="themes-table" data-source="theme_summary" data-row-key="theme">
+        <thead><tr><th data-field="theme">섹터</th><th data-field="avg_change" class="lk-num">미국 평균 등락</th><th data-field="n_tickers" class="lk-num">미국 종목 수</th><th data-field="n_with_data" class="lk-num">등락률 있는 종목</th><th data-field="outlook">국장 영향(참고)</th><th data-field="reason">재료</th></tr></thead>
+        <tbody data-draw="theme-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="lk-card lk-guide" id="guide">
+    <h2 class="lk-h2">읽는 법</h2>
+    <p class="lk-note">연계 방식은 연동이 강한 순서로 놓았고, 강할수록 진한 색입니다.</p>
+    <ul>
+      <li><span class="lk-badge lk-rel-5">공급망</span> 한국 기업이 미국 기업에 부품이나 기술을 직접 공급하거나 로열티를 받습니다. 미국 기업 실적이 한국 기업 매출로 바로 이어집니다.</li>
+      <li><span class="lk-badge lk-rel-4">업황 공유</span> AI, 전력, 유가처럼 같은 수요나 가격을 따라 움직입니다.</li>
+      <li><span class="lk-badge lk-rel-3">투자 수혜</span> 미국 기업이 투자를 늘리면 한국 기업 제품 수요가 늘 수 있는 관계입니다.</li>
+      <li><span class="lk-badge lk-rel-2">정책·테마</span> 정책이나 뉴스에 함께 반응합니다. 하루 이틀 반응하고 되돌릴 수 있습니다.</li>
+      <li><span class="lk-badge lk-rel-1">판매 채널</span> 미국 기업이 한국 제품을 파는 유통 채널입니다. 주가 연동은 약합니다.</li>
+      <li><span class="lk-badge lk-rel-0">같은 섹터</span> 업종만 같습니다. 연동이 가장 약합니다.</li>
+    </ul>
+    <ul>
+      <li><b>상관계수</b>: 미국 종목이 오른 날 다음 날 한국 종목도 오르고, 내린 날 내리는 정도입니다. 1에 가까울수록 같이 움직이고, 0이면 관계가 없고, 음수면 반대로 움직입니다.</li>
+      <li><b>방향 일치율</b>: 다음 날 한국 종목이 미국 종목과 같은 방향으로 움직인 날의 비율입니다. 50%면 동전 던지기와 같습니다.</li>
+      <li><b>반응 배율</b>: 미국 종목이 1% 움직일 때 다음 날 한국 종목이 평균 몇 % 움직였는지입니다.</li>
+      <li><b>예상 반응</b>: 반응 배율 × 가장 최근 미국 등락률입니다. 과거 평균으로 낸 참고치라 실제 국장과 다를 수 있고, 상관계수가 낮은 쌍일수록 믿기 어렵습니다.</li>
+      <li>측정 기간은 미국 거래일 기준 <b data-draw="win-start" data-source="meta" data-field="window_start">—</b>부터 <b data-draw="win-end" data-source="meta" data-field="window_end">—</b>까지이며, 한국 휴장일이 겹친 날은 빠집니다. 시세를 받지 못한 종목은 빈칸입니다.</li>
+      <li><b>갱신 방식</b>: 미장이 마감하면 지도 색, 예상 반응, 추천 테마가 그 미장 기준으로 새로 바뀝니다. 국장이 마감하면 전일 미장과 그날 국장 한 쌍이 60일 상관계수에 더해질 뿐 화면 기준은 그대로입니다.</li>
+      <li><b>외국인 연동</b>: 미국 종목이 오른 날 다음 한국 거래일에 외국인이 그 한국 종목을 순매수한 정도(상관계수)입니다. 높을수록 "미장 상승 → 외국인 매수 → 국장 상승" 경로가 실제로 작동해 온 종목입니다.</li>
+      <li><b>외국인 5일</b>: 가장 최근 한국 마감까지 5거래일 동안의 외국인 순매수 금액(순매매량 × 종가, 억 원)입니다. 네이버 금융 기준이며 당일 값은 잠정치일 수 있습니다.</li>
+      <li><b>추천 테마</b>: 미장 상승폭과 국장 연동이 함께 큰 섹터입니다. 과거 60일 평균으로 고른 참고 목록이라 실제 국장이 반대로 갈 수 있습니다.</li>
+    </ul>
+    <p class="lk-note">근거 열에서 소모임 자료는 인터즈 종목 선정 소모임 요약본, 기사는 이번에 확인한 기사입니다. 같은 업종과 추론은 업종과 흐름으로 묶은 것이라 직접 확인이 필요합니다. 동아리 내부 학습용이며 투자 권유가 아닙니다.</p>
+  </section>
+</div>
+
+  <div class="lk-msg" id="lk-msg" hidden></div>
+  <p class="lk-foot">INTERS 내부 학습용이며 투자 권유가 아닙니다. 주가는 Yahoo Finance 종가 기준이고, 미장이 마감하면(오전 6시 30분쯤) 화면이 새로 바뀌고, 국장이 마감하면(오후 4시 30분쯤) 그 결과가 상관계수에 반영됩니다. 마지막 갱신 <span data-draw="updated">—</span>. <button type="button" class="lk-share" id="lk-copy">지금 보고 있는 종목 링크 복사</button></p>
+</div>
+<script>
+"use strict";
+// 대시보드 런타임 대신 쓰는 작은 도우미: 데이터 불러오기, 계산, 그리기, 선택 상태(주소 #us=티커)
+const dash = (() => {
+  const store = {}, calcs = {}, draws = [];
+  let cache = {}, params = {};
+  const readHash = () => {
+    const get = (k) => { const m = location.hash.match(new RegExp('(?:^#|&)' + k + '=([^&]+)')); return m ? decodeURIComponent(m[1]) : null; };
+    params = {}; const u = get('us'), i = get('idx'); if (u) params.us = u; if (i === 'ndx') params.idx = 'ndx';
+  };
+  function data(name) {
+    if (name in cache) return cache[name];
+    const c = calcs[name];
+    if (c) {
+      const ins = c.inputs.map(data);
+      const bad = ins.find((x) => x.status !== 'ok');
+      if (bad) return { status: bad.status };
+      let out;
+      try { out = { status: 'ok', data: c.fn(...ins.map((x) => x.data)) }; } catch (e) { console.error(e); out = { status: 'error' }; }
+      return (cache[name] = out);
+    }
+    return store[name] || { status: 'loading' };
+  }
+  function render() {
+    draws.forEach(([name, fn]) => document.querySelectorAll('[data-draw="' + name + '"]').forEach((el) => {
+      try { fn(el); } catch (e) { console.error(name, e); }
+    }));
+  }
+  let t = null;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(render, 150); });
+  window.addEventListener('hashchange', () => { readHash(); render(); });
+  readHash();
+  return {
+    calc: (name, def) => { calcs[name] = def; },
+    draw: (name, fn) => { draws.push([name, fn]); },
+    data, params: () => ({ ...params }), render,
+    setParams: (p) => {
+      params = { ...params, ...p }; cache = {};
+      const h = [params.idx === 'ndx' ? 'idx=ndx' : '', params.us ? 'us=' + encodeURIComponent(params.us) : ''].filter(Boolean).join('&');
+      history.replaceState(null, '', h ? '#' + h : location.pathname); render();
+    },
+    load: (sets) => { Object.assign(store, sets); cache = {}; render(); },
+  };
+})();
+</script>
+<script>
+const LK_UP = 1;      // 섹터 평균이 이 값(%) 이상이면 강세 예상
+const LK_DOWN = -1;   // 이 값(%) 이하이면 약세 예상
+const LK_RANGE = 4;   // 지도 색이 가장 진해지는 등락률(%)
+const LK_MIN_N = 2;
+const LK_CPL_STRONG = 0.4;  // 상관계수 강함 기준
+const LK_CPL_MID = 0.2;     // 상관계수 보통 기준
+const LK_RECO_US = 1;       // 추천 테마: 미국 평균 등락 기준(%)
+const LK_RECO_CORR = 0.25;  // 추천 테마: 연동 기준 (상관계수 상위 5개 평균)
+const LK_PICK_CORR = 0.3;   // 추천 종목: 상관계수 기준
+const LK_RECO_MAX = 6;      // 보여 줄 추천 테마 수
+const LK_WARN_MAX = 3;      // 보여 줄 약세 주의 테마 수
+const LK_F_CORR = 0.2;      // 외국인 확인 배지: 외국인 연동 기준   // 한 줄 요약에 쓸 섹터의 최소 종목 수(등락률 있는 종목)
+
+dash.calc('theme_summary', {
+  title: '섹터별 미국 평균 등락',
+  description: '연계 섹터마다 미국 종목 등락률의 단순 평균과 종목 수, 그 평균으로 매긴 국장 영향(참고)과 재료',
+  inputs: ['us_moves', 'themes'],
+  fn: (us_moves, themes) => {
+    const up = 1, down = -1;
+    return themes.map((t) => {
+      const rows = us_moves.filter((r) => r.theme === t.theme);
+      const vals = rows.map((r) => r.change_pct).filter((v) => v !== null && v !== undefined && v !== '').map(Number).filter((v) => !Number.isNaN(v));
+      const avg = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) / 100 : null;
+      return {
+        theme: t.theme, avg_change: avg, n_tickers: rows.length, n_with_data: vals.length,
+        outlook: avg === null ? '자료 없음' : avg >= up ? '강세 예상' : avg <= down ? '약세 예상' : '보합',
+        reason: t.reason || '',
+      };
+    }).sort((a, b) => (b.avg_change ?? -999) - (a.avg_change ?? -999));
+  },
+});
+
+dash.calc('relation_check', {
+  title: '연계 방식별 실제 커플링',
+  description: '연계 방식마다 측정된 종목 쌍의 수와 상관계수·방향 일치율·반응 배율의 평균',
+  inputs: ['kr_links'],
+  fn: (kr_links) => {
+    const order = ['공급망', '업황 공유', '투자 수혜', '정책·테마', '판매 채널', '같은 섹터'];
+    const ok = (v) => v !== null && v !== undefined && v !== '' && !Number.isNaN(Number(v));
+    const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+    return order.map((rel) => {
+      const g = kr_links.filter((r) => r.relation === rel && ok(r.corr));
+      const r2 = (v) => (v === null ? null : Math.round(v * 100) / 100);
+      return { relation: rel, n_pairs: g.length,
+        avg_corr: r2(mean(g.map((r) => Number(r.corr)))),
+        avg_hit: g.length ? Math.round(mean(g.map((r) => Number(r.hit_rate)))) : null,
+        avg_beta: r2(mean(g.map((r) => Number(r.beta)))) };
+    }).filter((r) => r.n_pairs > 0);
+  },
+});
+
+dash.calc('theme_reco', {
+  title: '국장 추천·약세 주의 테마',
+  description: '연계 섹터마다 미국 평균 등락, 한국 종목과의 연동(상관계수 상위 5개 평균), 점수(미국 평균 × 연동), 외국인 연동과 추천 종목의 최근 5일 외국인 순매수, 예상 반응이 큰 한국 종목과 재료',
+  inputs: ['us_moves', 'kr_links', 'themes'],
+  fn: (us_moves, kr_links, themes) => {
+    const RECO_US = 1, RECO_CORR = 0.25, PICK_CORR = 0.3;
+    const ok = (v) => v !== null && v !== undefined && v !== '' && !Number.isNaN(Number(v));
+    const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+    const why = new Map(themes.map((t) => [t.theme, t]));
+    const uniq = new Map(); us_moves.forEach((r) => { if (!uniq.has(r.ticker)) uniq.set(r.ticker, r); });
+    const byTheme = new Map();
+    uniq.forEach((r) => { if (!byTheme.has(r.theme)) byTheme.set(r.theme, []); byTheme.get(r.theme).push(r); });
+    const out = [];
+    byTheme.forEach((rows, theme) => {
+      const priced = rows.filter((r) => ok(r.change_pct));
+      if (!priced.length) return;
+      const us_avg = Math.round(mean(priced.map((r) => Number(r.change_pct))) * 100) / 100;
+      const tick = new Set(rows.map((r) => r.ticker));
+      const best = new Map();
+      kr_links.forEach((l) => {
+        if (!tick.has(l.ticker) || !ok(l.corr)) return;
+        const cur = best.get(l.kr_name);
+        if (!cur || Number(l.corr) > Number(cur.corr)) best.set(l.kr_name, l);
+      });
+      const corrs = [...best.values()].map((l) => Number(l.corr)).sort((a, b) => b - a);
+      if (!corrs.length) return;
+      const kr_corr = Math.round(mean(corrs.slice(0, 5)) * 100) / 100;
+      const up = us_avg >= RECO_US, down = us_avg <= -RECO_US;
+      const kind = kr_corr >= RECO_CORR ? (up ? '추천' : down ? '주의' : '') : '';
+      if (!kind) return;
+      const fc = [...best.values()].filter((l) => ok(l.f_corr)).map((l) => Number(l.f_corr)).sort((a, b) => b - a);
+      const f_corr = fc.length ? Math.round(mean(fc.slice(0, 5)) * 100) / 100 : null;
+      const picks = [...best.values()].filter((l) => Number(l.corr) >= PICK_CORR && ok(l.expected_pct))
+        .sort((a, b) => (kind === '추천' ? Number(b.expected_pct) - Number(a.expected_pct) : Number(a.expected_pct) - Number(b.expected_pct))).slice(0, 4);
+      const lead = priced.reduce((a, b) => (kind === '추천' ? (Number(b.change_pct) > Number(a.change_pct) ? b : a) : (Number(b.change_pct) < Number(a.change_pct) ? b : a)));
+      const t = why.get(theme) || {};
+      out.push({
+        theme, kind, us_avg, n_us: priced.length, kr_corr, score: Math.round(us_avg * kr_corr * 100) / 100,
+        exp_avg: picks.length ? Math.round(mean(picks.map((l) => Number(l.expected_pct))) * 100) / 100 : null,
+        picks: picks.map((l) => l.kr_name + ' ' + (Number(l.expected_pct) > 0 ? '+' : '') + Number(l.expected_pct).toFixed(2) + '%'
+          + (ok(l.f_net_5d) ? ' (외 ' + (Number(l.f_net_5d) > 0 ? '+' : '') + Math.round(Number(l.f_net_5d)).toLocaleString() + '억)' : '')).join(' | '),
+        f_corr, f_net_5d: picks.some((l) => ok(l.f_net_5d)) ? Math.round(picks.reduce((a, l) => a + (ok(l.f_net_5d) ? Number(l.f_net_5d) : 0), 0)) : null,
+        lead_ticker: lead.ticker, lead_change: Number(lead.change_pct), reason: t.reason || '', reason_source: t.reason_source || '',
+      });
+    });
+    return out.sort((a, b) => Math.abs(b.score) - Math.abs(a.score));
+  },
+});
+
+dash.calc('coverage', {
+  title: '지수별 시세가 있는 종목 수',
+  description: 'S&P 500과 나스닥 100 각각의 종목 수와 그중 등락률이 있는 종목 수',
+  inputs: ['us_moves'],
+  fn: (us_moves) => {
+    const has = (r) => r.change_pct !== null && r.change_pct !== undefined && r.change_pct !== '';
+    return [['sp', 'in_sp'], ['ndx', 'in_ndx']].map(([idx, col]) => {
+      const rows = us_moves.filter((r) => r[col] === true || r[col] === 'true');
+      return { idx, total: rows.length, shown: rows.filter(has).length };
+    });
+  },
+});
+
+const num = (v) => (v === null || v === undefined || v === '' || Number.isNaN(Number(v))) ? null : Number(v);
+const pct = (v) => { const n = num(v); return n === null ? '—' : (n > 0 ? '+' : '') + n.toFixed(2) + '%'; };
+const enc = (s) => String(s).replace(/%/g, '%25').replace(/&/g, '%26').replace(/=/g, '%3D');
+const setWhere = (el, col, val) => { if (val === undefined || val === null) el.removeAttribute('data-where'); else el.setAttribute('data-where', col + '=' + enc(val)); };
+const REL_LEVEL = { '공급망': 5, '업황 공유': 4, '투자 수혜': 3, '정책·테마': 2, '판매 채널': 1, '같은 섹터': 0 };
+
+function selectedTicker(us) {
+  const p = dash.params().us;
+  if (p && us.some((r) => r.ticker === p)) return p;
+  const withNum = us.filter((r) => num(r.change_pct) !== null);
+  if (!withNum.length) return us.length ? us[0].ticker : null;
+  return withNum.reduce((a, b) => (num(b.change_pct) > num(a.change_pct) ? b : a)).ticker;
+}
+function selectedRow() {
+  const g = dash.data('us_moves');
+  if (g.status !== 'ok') return null;
+  const t = selectedTicker(g.data);
+  return g.data.find((r) => r.ticker === t) || null;
+}
+function pick(ticker) {
+  dash.setParams({ us: ticker });
+  const panel = document.getElementById('links');
+  if (panel && panel.getBoundingClientRect().top > window.innerHeight * 0.6) panel.scrollIntoView({ block: 'start' });
+}
+function themeEnd(which) {
+  const g = dash.data('theme_summary');
+  if (g.status !== 'ok') return null;
+  const rows = g.data.filter((r) => r.avg_change !== null && r.n_with_data >= LK_MIN_N);
+  if (!rows.length) return null;
+  return which === 'top' ? rows[0] : rows[rows.length - 1];
+}
+function relCell(rel) {
+  const td = document.createElement('td');
+  td.className = 'lk-rel';
+  const b = document.createElement('span');
+  b.className = 'lk-badge lk-rel-' + (REL_LEVEL[rel] ?? 0);
+  b.textContent = rel;
+  td.appendChild(b);
+  return td;
+}
+function cplCell(v) {
+  const td = document.createElement('td');
+  td.className = 'lk-num';
+  const sp = document.createElement('span');
+  const n = num(v);
+  sp.className = 'lk-cpl ' + (n === null ? 'na' : n >= LK_CPL_STRONG ? 'c3' : n >= LK_CPL_MID ? 'c2' : n >= 0 ? 'c1' : 'c0');
+  sp.textContent = n === null ? '—' : n.toFixed(2);
+  td.appendChild(sp);
+  return td;
+}
+function cell(text, cls) { const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = text; return td; }
+
+// ───── 한 줄 요약 ─────
+[['top-theme', 'top', 'theme'], ['low-theme', 'low', 'theme'], ['top-avg', 'top', 'avg'], ['low-avg', 'low', 'avg']].forEach(([name, which, kind]) => {
+  dash.draw(name, (el) => {
+    const r = themeEnd(which);
+    el.textContent = r ? (kind === 'theme' ? r.theme : pct(r.avg_change)) : '—';
+    setWhere(el, 'theme', r ? r.theme : null);
+    el.classList.toggle('up', kind === 'avg' && !!r && r.avg_change > 0);
+    el.classList.toggle('down', kind === 'avg' && !!r && r.avg_change < 0);
+  });
+});
+const kdate = (s) => { if (!s) return '—'; const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); const w = '일월화수목금토'[new Date(y, m - 1, d).getDay()]; return m + '월 ' + d + '일(' + w + ')'; };
+const kshort = (s) => { if (!s) return '—'; const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return m + '/' + d; };
+const metaRow = () => { const g = dash.data('meta'); return g.status === 'ok' && g.data[0] ? g.data[0] : null; };
+[['us-date', 'us_date', kdate], ['us-date-2', 'us_date', kdate], ['us-date-3', 'us_date', kdate], ['next-kr-date', 'next_kr_date', kdate],
+ ['next-kr-date-2', 'next_kr_date', kdate], ['next-kr-short', 'next_kr_date', kshort], ['win-start', 'window_start', kdate],
+ ['win-end', 'window_end', kdate], ['win-days', 'window_days', (v) => String(v)], ['src-name', 'price_source', (v) => String(v)]].forEach(([n, f, fmt]) =>
+  dash.draw(n, (el) => { const m = metaRow(); el.textContent = m && m[f] !== undefined && m[f] !== null ? fmt(m[f]) : '—'; }));
+dash.draw('flow-date', (el) => { const m = metaRow(); el.textContent = m && m.flow_date ? kdate(m.flow_date) : '—'; });
+dash.draw('th-f-corr', (el) => { el.textContent = LK_F_CORR.toFixed(1); });
+dash.draw('th-reco-us', (el) => { el.textContent = '+' + LK_RECO_US + '%'; });
+dash.draw('th-reco-us-neg', (el) => { el.textContent = '-' + LK_RECO_US + '%'; });
+dash.draw('th-reco-corr', (el) => { el.textContent = LK_RECO_CORR.toFixed(2); });
+dash.draw('th-pick-corr', (el) => { el.textContent = LK_PICK_CORR.toFixed(1); });
+function recoCards(el, kind, max) {
+  el.replaceChildren();
+  const g = dash.data('theme_reco');
+  if (g.status !== 'ok') return;
+  g.data.filter((r) => r.kind === kind).slice(0, max).forEach((r, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'lk-reco-card' + (kind === '주의' ? ' is-down' : '');
+    const top = document.createElement('div'); top.className = 'lk-reco-top';
+    const nm = document.createElement('span'); nm.className = 'lk-reco-name'; nm.textContent = r.theme;
+    const rk = document.createElement('span'); rk.className = 'lk-reco-rank'; rk.textContent = (i + 1) + '위';
+    const fOk = num(r.f_corr) !== null && r.f_corr >= LK_F_CORR && num(r.f_net_5d) !== null;
+    if (fOk && ((kind === '추천' && r.f_net_5d > 0) || (kind === '주의' && r.f_net_5d < 0))) {
+      const bd = document.createElement('span'); bd.className = 'lk-fbadge' + (kind === '주의' ? ' is-sell' : '');
+      bd.textContent = kind === '주의' ? '외국인 매도 확인' : '외국인 확인'; nm.appendChild(bd);
+    }
+    top.append(nm, rk);
+    const st = document.createElement('div'); st.className = 'lk-reco-stats';
+    const item = (label, val, cls) => { const sp = document.createElement('span'); sp.append(label + ' '); const v = document.createElement('b'); v.textContent = val; if (cls) v.className = cls; sp.appendChild(v); return sp; };
+    st.append(item('미국 평균', pct(r.us_avg), r.us_avg > 0 ? 'up' : 'down'), item('연동', num(r.kr_corr).toFixed(2)),
+      item('예상 반응', r.exp_avg === null ? '—' : pct(r.exp_avg), r.exp_avg > 0 ? 'up' : r.exp_avg < 0 ? 'down' : ''),
+      item('대표', r.lead_ticker + ' ' + pct(r.lead_change)),
+      item('외국인 연동', num(r.f_corr) === null ? '—' : num(r.f_corr).toFixed(2)),
+      item('외국인 5일', num(r.f_net_5d) === null ? '—' : (r.f_net_5d > 0 ? '+' : '') + Math.round(r.f_net_5d).toLocaleString() + '억', r.f_net_5d > 0 ? 'up' : r.f_net_5d < 0 ? 'down' : ''));
+    b.append(top, st);
+    if (r.reason) { const w = document.createElement('p'); w.className = 'lk-reco-why'; w.textContent = r.reason + (r.reason_source ? ' (' + r.reason_source + ')' : ''); b.appendChild(w); }
+    if (r.picks) {
+      const pk = document.createElement('div'); pk.className = 'lk-reco-picks';
+      r.picks.split(' | ').forEach((t) => { const c = document.createElement('span'); c.className = 'lk-pick-chip'; c.textContent = t; pk.appendChild(c); });
+      b.appendChild(pk);
+    }
+    b.addEventListener('click', () => pick(r.lead_ticker));
+    el.appendChild(b);
+  });
+}
+dash.draw('reco-up', (el) => recoCards(el, '추천', LK_RECO_MAX));
+dash.draw('reco-down', (el) => recoCards(el, '주의', LK_WARN_MAX));
+dash.draw('reco-switch', () => {
+  const g = dash.data('theme_reco');
+  const has = (k) => g.status === 'ok' && g.data.some((r) => r.kind === k);
+  document.querySelectorAll('.lk-reco-empty').forEach((p) => { p.hidden = g.status !== 'ok' || has('추천'); });
+  document.querySelectorAll('.lk-reco-empty-down').forEach((p) => { p.hidden = g.status !== 'ok' || has('주의'); });
+});
+dash.draw('cpl-strong', (el) => { el.textContent = LK_CPL_STRONG.toFixed(1); });
+dash.draw('cpl-mid', (el) => { el.textContent = LK_CPL_MID.toFixed(1); });
+function bestRel() {
+  const g = dash.data('relation_check');
+  if (g.status !== 'ok' || !g.data.length) return null;
+  return g.data.reduce((a, b) => ((b.avg_corr ?? -9) > (a.avg_corr ?? -9) ? b : a));
+}
+dash.draw('best-rel', (el) => { const r = bestRel(); el.textContent = r ? r.relation : '—'; setWhere(el, 'relation', r ? r.relation : null); });
+dash.draw('best-rel-corr', (el) => { const r = bestRel(); el.textContent = r && r.avg_corr !== null ? r.avg_corr.toFixed(2) : '—'; setWhere(el, 'relation', r ? r.relation : null); });
+dash.draw('check-rows', (tb) => {
+  tb.replaceChildren();
+  const g = dash.data('relation_check');
+  if (g.status !== 'ok') return;
+  g.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    tr.dataset.key = r.relation;
+    tr.append(relCell(r.relation), cell(String(r.n_pairs), 'lk-num'), cplCell(r.avg_corr),
+      cell(r.avg_hit === null ? '—' : r.avg_hit + '%', 'lk-num'), cell(r.avg_beta === null ? '—' : r.avg_beta.toFixed(2), 'lk-num'));
+    tb.appendChild(tr);
+  });
+});
+dash.draw('th-up', (el) => { el.textContent = '+' + LK_UP + '%'; });
+['sp', 'ndx'].forEach((idx) => ['shown', 'total'].forEach((k) => dash.draw('cov-' + idx + '-' + k, (el) => {
+  const g = dash.data('coverage');
+  const row = g.status === 'ok' ? g.data.find((r) => r.idx === idx) : null;
+  el.textContent = row ? d3.format(',')(row[k]) : '—';
+  setWhere(el, 'idx', row ? idx : null);
+})));
+dash.draw('tickers', (el) => {
+  const g = dash.data('us_moves');
+  el.replaceChildren();
+  if (g.status !== 'ok') return;
+  g.data.forEach((r) => { const o = document.createElement('option'); o.value = r.ticker; o.label = r.company; el.appendChild(o); });
+});
+document.querySelectorAll('.lk-search').forEach((inp) => {
+  const go = () => {
+    const g = dash.data('us_moves');
+    if (g.status !== 'ok') return;
+    const q = inp.value.trim().toUpperCase();
+    if (!q) return;
+    const hit = g.data.find((r) => r.ticker.toUpperCase() === q) || g.data.find((r) => String(r.company).toUpperCase() === q);
+    if (hit) { pick(hit.ticker); inp.value = ''; inp.blur(); }
+  };
+  inp.addEventListener('change', go);
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+});
+dash.draw('th-down', (el) => { el.textContent = LK_DOWN + '%'; });
+
+// ───── 색 범례 ─────
+function tokenColor(host, prop) {
+  const s = document.createElement('span');
+  s.style.color = `var(${prop})`;
+  host.appendChild(s);
+  const c = getComputedStyle(s).color;
+  s.remove();
+  return c;
+}
+function palette(host) {
+  const base = tokenColor(host, '--color-panel'), ok = tokenColor(host, '--color-ok'), bad = tokenColor(host, '--color-bad');
+  const fg = tokenColor(host, '--color-fg'), bg = tokenColor(host, '--color-bg');
+  const fill = (v) => {
+    const n = num(v);
+    if (n === null) return d3.interpolateRgb(base, fg)(0.16);
+    const t = Math.min(Math.abs(n) / LK_RANGE, 1);
+    return d3.interpolateRgb(base, n >= 0 ? ok : bad)(0.22 + 0.78 * t);
+  };
+  const lum = (c) => { const r = d3.rgb(c); const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r.r) + 0.7152 * f(r.g) + 0.0722 * f(r.b); };
+  const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const ink = (c) => (contrast(c, fg) >= contrast(c, bg) ? fg : bg);
+  return { fill, ink };
+}
+dash.draw('legend', (el) => {
+  el.replaceChildren();
+  const pal = palette(el);
+  const W = 160, H = 10, ns = 'http://www.w3.org/2000/svg';
+  const lo = document.createElement('span'); lo.textContent = '-' + LK_RANGE + '%';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('aria-hidden', 'true');
+  const steps = 16;
+  for (let i = 0; i < steps; i++) {
+    const v = -LK_RANGE + (2 * LK_RANGE) * (i + 0.5) / steps;
+    const r = document.createElementNS(ns, 'rect');
+    r.setAttribute('x', i * W / steps); r.setAttribute('y', 0); r.setAttribute('width', W / steps + 0.5); r.setAttribute('height', H);
+    r.setAttribute('fill', pal.fill(v)); svg.appendChild(r);
+  }
+  const hi = document.createElement('span'); hi.textContent = '+' + LK_RANGE + '%';
+  const na = document.createElement('span'); na.style.marginLeft = 'var(--cds-gap-md)';
+  const sw = document.createElement('span'); sw.style.cssText = `display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;background:${pal.fill(null)}`;
+  na.append(sw, '숫자 없음');
+  el.append(lo, svg, hi, na);
+});
+
+// ───── 지도 ─────
+function drawMap(el, idx) {
+  const u = dash.data('us_moves'), ts = dash.data('theme_summary'), k = dash.data('kr_links');
+  el.replaceChildren();
+  if (u.status === 'error' || ts.status === 'error') {
+    el.classList.remove('dash-skeleton');
+    const f = document.createElement('div'); f.className = 'lk-fail'; f.textContent = '불러오지 못했습니다'; el.appendChild(f);
+    return;
+  }
+  if (u.status !== 'ok' || ts.status !== 'ok') { el.classList.add('dash-skeleton'); return; }
+  el.classList.remove('dash-skeleton');
+
+  const pal = palette(el);
+  const W = Math.max(280, Math.round(el.clientWidth || 600));
+  const H = idx === 'ndx' ? Math.round(Math.max(420, Math.min(640, W * 0.5))) : Math.round(Math.max(520, Math.min(860, W * 0.68)));
+  const nLinks = d3.rollup(k.status === 'ok' ? k.data : [], (v) => v.length, (d) => d.ticker);
+  const inIdx = (r) => (idx === 'ndx' ? (r.in_ndx === true || r.in_ndx === 'true') : (r.in_sp === true || r.in_sp === 'true'));
+  const bySector = d3.groups(u.data.filter(inIdx), (d) => d.sector, (d) => d.sub_industry);
+  const root = d3.hierarchy({ children: bySector.map(([sector, subs]) => ({ sector, children: subs.map(([sub, rows]) => ({ sub, children: rows.map((r) => ({ row: r })) })) })) })
+    .sum((d) => (d.row ? Math.max(num(idx === 'ndx' ? d.row.ndx_cap : d.row.weight) || 0, idx === 'ndx' ? 5 : 0.004) : 0))
+    .sort((a, b) => b.value - a.value);
+  d3.treemap().tile(d3.treemapSquarify).size([W, H])
+    .paddingOuter((d) => (d.depth === 0 ? 0 : 1)).paddingInner((d) => (d.depth === 0 ? 3 : 1))
+    .paddingTop((d) => (d.depth === 1 ? 18 : d.depth === 0 ? 0 : 1)).round(true)(root);
+
+  const sel = selectedTicker(u.data);
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', (idx === 'ndx' ? '나스닥 100' : 'S&P 500') + ' 섹터별 등락률 지도');
+
+  const fit = (textSel, maxW) => {
+    const node = textSel.node();
+    if (!node) return;
+    let s = node.textContent;
+    while (s.length > 1 && node.getComputedTextLength() > maxW) { s = s.slice(0, -1); node.textContent = s + '…'; }
+    if (node.getComputedTextLength() > maxW) node.textContent = '';
+  };
+
+  const grp = svg.append('g').selectAll('g').data(root.children).join('g').attr('class', 'lk-grp');
+  grp.append('rect').attr('class', 'lk-sec-box').attr('x', (d) => d.x0 + 0.5).attr('y', (d) => d.y0 + 0.5)
+    .attr('width', (d) => Math.max(0, d.x1 - d.x0 - 1)).attr('height', (d) => Math.max(0, d.y1 - d.y0 - 1)).attr('rx', 3);
+  grp.append('text').attr('x', (d) => d.x0 + 4).attr('y', (d) => d.y0 + 13)
+    .attr('fill', 'var(--color-fg)').attr('font-size', 11.5).attr('font-weight', 600)
+    .text((d) => d.data.sector)
+    .each(function (d) { fit(d3.select(this), d.x1 - d.x0 - 8); });
+
+  const tip = document.createElement('div');
+  tip.className = 'lk-tip'; tip.hidden = true; el.appendChild(tip);
+  const showTip = (event, d) => {
+    const r = d.data.row;
+    tip.replaceChildren();
+    const l1 = document.createElement('div'); const b = document.createElement('b'); b.textContent = r.ticker; l1.append(b, ' ' + r.company);
+    const l2 = document.createElement('div'); l2.className = 'lk-tip-sub'; l2.textContent = r.sector + ' / ' + r.sub_industry + (idx === 'ndx' ? ', 시가총액 ' + (num(r.ndx_cap) === null ? '-' : '$' + Math.round(num(r.ndx_cap)).toLocaleString() + 'B') : ', 비중 ' + (num(r.weight) === null ? '-' : num(r.weight).toFixed(2) + '%'));
+    const l3 = document.createElement('div'); l3.textContent = '등락률 ' + (num(r.change_pct) === null ? '화면에 숫자 없음' : pct(r.change_pct));
+    const l4 = document.createElement('div'); l4.textContent = '연계 섹터 ' + r.theme + ', 한국 종목 ' + (nLinks.get(r.ticker) || 0) + '개';
+    tip.append(l1, l2, l3, l4);
+    tip.hidden = false;
+    const box = el.getBoundingClientRect();
+    let x = event.clientX - box.left + 12, y = event.clientY - box.top + 12;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    if (x + tw > box.width) x = Math.max(0, event.clientX - box.left - tw - 12);
+    if (y + th > box.height) y = Math.max(0, event.clientY - box.top - th - 12);
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  };
+
+  const leaves = svg.append('g').selectAll('g').data(root.leaves()).join('g')
+    .attr('class', (d) => 'lk-tile' + (d.data.row.ticker === sel ? ' is-sel' : ''))
+    .attr('transform', (d) => `translate(${d.x0},${d.y0})`)
+    .attr('tabindex', 0).attr('role', 'button')
+    .attr('aria-label', (d) => `${d.data.row.ticker} ${d.data.row.company} ${num(d.data.row.change_pct) === null ? '등락률 없음' : pct(d.data.row.change_pct)}`)
+    .on('pointermove', showTip).on('pointerleave', () => { tip.hidden = true; })
+    .on('click', (event, d) => pick(d.data.row.ticker))
+    .on('keydown', (event, d) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); pick(d.data.row.ticker); } });
+
+  leaves.append('rect').attr('width', (d) => Math.max(0, d.x1 - d.x0)).attr('height', (d) => Math.max(0, d.y1 - d.y0))
+    .attr('rx', (d) => (Math.min(d.x1 - d.x0, d.y1 - d.y0) > 12 ? 2 : 0)).attr('fill', (d) => pal.fill(d.data.row.change_pct));
+
+  leaves.each(function (d) {
+    const w = d.x1 - d.x0, h = d.y1 - d.y0, g = d3.select(this), fillC = pal.fill(d.data.row.change_pct), ink = pal.ink(fillC);
+    if (w < 22 || h < 13) return;
+    const big = Math.max(8.5, Math.min(26, Math.min(w / 3.4, h / 2.4)));
+    const showPct = h >= big * 2.4 && w >= 38;
+    const ty = showPct ? h / 2 - big * 0.15 : h / 2 + big * 0.35;
+    const t1 = g.append('text').attr('x', w / 2).attr('y', ty).attr('text-anchor', 'middle')
+      .attr('font-size', big).attr('font-weight', 700).attr('fill', ink).text(d.data.row.ticker);
+    fit(t1, w - 6);
+    if (showPct) {
+      const t2 = g.append('text').attr('x', w / 2).attr('y', ty + big * 1.05).attr('text-anchor', 'middle')
+        .attr('font-size', Math.max(9.5, big * 0.62)).attr('fill', ink)
+        .text(num(d.data.row.change_pct) === null ? '·' : pct(d.data.row.change_pct));
+      fit(t2, w - 6);
+    }
+  });
+}
+
+
+dash.draw('map-sp', (el) => drawMap(el, 'sp'));
+dash.draw('map-ndx', (el) => drawMap(el, 'ndx'));
+
+// ───── 선택한 종목 ─────
+[['sel-ticker', 'ticker'], ['sel-name', 'company'], ['sel-theme', 'theme'], ['sel-src', 'value_source'], ['sel-sector', 'sector'], ['sel-sub', 'sub_industry']].forEach(([name, col]) => {
+  dash.draw(name, (el) => {
+    const r = selectedRow();
+    el.textContent = r ? r[col] : '—';
+    setWhere(el, 'ticker', r ? r.ticker : null);
+  });
+});
+dash.draw('sel-weight', (el) => {
+  const r = selectedRow();
+  const n = r ? num(r.weight) : null;
+  el.textContent = n === null ? '—' : n.toFixed(2) + '%';
+  setWhere(el, 'ticker', r ? r.ticker : null);
+});
+dash.draw('sel-cap', (el) => {
+  const r = selectedRow();
+  const n = r ? num(r.ndx_cap) : null;
+  el.textContent = n === null ? '—' : '$' + Math.round(n).toLocaleString() + 'B';
+  setWhere(el, 'ticker', r ? r.ticker : null);
+});
+dash.draw('sel-change', (el) => {
+  const r = selectedRow();
+  const n = r ? num(r.change_pct) : null;
+  el.textContent = n === null ? '—' : pct(n);
+  setWhere(el, 'ticker', r ? r.ticker : null);
+  el.classList.toggle('up', n !== null && n > 0);
+  el.classList.toggle('down', n !== null && n < 0);
+});
+function themeInfo() {
+  const r = selectedRow(), g = dash.data('themes');
+  if (!r || g.status !== 'ok') return null;
+  return g.data.find((t) => t.theme === r.theme) || null;
+}
+dash.draw('reason-switch', () => {
+  const t = themeInfo();
+  const has = !!(t && t.reason);
+  document.querySelectorAll('.lk-reason').forEach((p) => { p.hidden = !has; });
+  document.querySelectorAll('.lk-noreason').forEach((p) => { p.hidden = has || !t; });
+});
+dash.draw('sel-reason', (el) => { const t = themeInfo(); el.textContent = t && t.reason ? t.reason : '—'; setWhere(el, 'theme', t ? t.theme : null); });
+dash.draw('sel-reason-src', (el) => { const t = themeInfo(); el.textContent = t && t.reason_source ? t.reason_source : '—'; setWhere(el, 'theme', t ? t.theme : null); });
+
+dash.draw('links', (tb) => {
+  tb.replaceChildren();
+  const g = dash.data('kr_links'), u = dash.data('us_moves');
+  if (g.status !== 'ok' || u.status !== 'ok') return;
+  const t = selectedTicker(u.data);
+  g.data.filter((r) => r.ticker === t)
+    .sort((a, b) => (num(b.corr) ?? -9) - (num(a.corr) ?? -9) || (REL_LEVEL[b.relation] ?? -1) - (REL_LEVEL[a.relation] ?? -1))
+    .forEach((r) => {
+      const tr = document.createElement('tr');
+      tr.dataset.key = r.link_id;
+      const ex = num(r.expected_pct);
+      tr.append(
+        cell(r.kr_name, 'lk-kr'),
+        relCell(r.relation),
+        cell(ex === null ? '—' : pct(ex), 'lk-num' + (ex > 0 ? ' up' : ex < 0 ? ' down' : '')),
+        cplCell(r.corr),
+        cell(num(r.hit_rate) === null ? '—' : Math.round(num(r.hit_rate)) + '%', 'lk-num'),
+        cell(num(r.beta) === null ? '—' : num(r.beta).toFixed(2), 'lk-num'),
+        cplCell(r.f_corr),
+        cell(num(r.f_net_5d) === null ? '—' : (num(r.f_net_5d) > 0 ? '+' : '') + Math.round(num(r.f_net_5d)).toLocaleString(), 'lk-num' + (num(r.f_net_5d) > 0 ? ' up' : num(r.f_net_5d) < 0 ? ' down' : '')),
+        cell(r.note),
+        cell(r.basis, 'lk-basis'),
+      );
+      tb.appendChild(tr);
+    });
+});
+
+// ───── 섹터 흐름 표 ─────
+dash.draw('theme-rows', (tb) => {
+  tb.replaceChildren();
+  const g = dash.data('theme_summary'), u = dash.data('us_moves');
+  if (g.status !== 'ok') return;
+  const selTheme = u.status === 'ok' ? (selectedRow() || {}).theme : null;
+  g.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    tr.dataset.key = r.theme;
+    if (r.theme === selTheme) tr.className = 'is-sel';
+    const out = cell(r.outlook, r.outlook === '강세 예상' ? 'up' : r.outlook === '약세 예상' ? 'down' : '');
+    tr.append(
+      cell(r.theme, 'lk-kr'),
+      cell(r.avg_change === null ? '—' : pct(r.avg_change), 'lk-num' + (r.avg_change > 0 ? ' up' : r.avg_change < 0 ? ' down' : '')),
+      cell(String(r.n_tickers), 'lk-num'),
+      cell(String(r.n_with_data), 'lk-num'),
+      out,
+      cell(r.reason || '', 'lk-reason-cell'),
+    );
+    tb.appendChild(tr);
+  });
+  tb.onclick = (event) => {
+    const tr = event.target.closest('tr[data-key]');
+    if (!tr) return;
+    const us = dash.data('us_moves');
+    if (us.status !== 'ok') return;
+    const rows = us.data.filter((x) => x.theme === tr.dataset.key);
+    if (!rows.length) return;
+    const best = rows.reduce((a, b) => ((num(b.change_pct) ?? -999) > (num(a.change_pct) ?? -999) ? b : a));
+    pick(best.ticker);
+  };
+});
+</script>
+<script>
+(async () => {
+  const toRows = (t) => t.rows.map((r) => Object.fromEntries(t.cols.map((c, i) => [c, r[i]])));
+  try {
+    const res = await fetch('data/link.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(res.status === 404 ? 'nodata' : 'HTTP ' + res.status);
+    const js = await res.json();
+    dash.load({
+      meta: { status: 'ok', data: [js.meta] },
+      us_moves: { status: 'ok', data: toRows(js.us) },
+      kr_links: { status: 'ok', data: toRows(js.links) },
+      themes: { status: 'ok', data: toRows(js.themes) },
+    });
+  } catch (e) {
+    ['meta', 'us_moves', 'kr_links', 'themes'].forEach(() => {});
+    dash.load({ meta: { status: 'error' }, us_moves: { status: 'error' }, kr_links: { status: 'error' }, themes: { status: 'error' } });
+    const m = document.getElementById('lk-msg');
+    m.textContent = e.message === 'nodata'
+      ? '아직 데이터가 없습니다. 저장소의 Actions 탭에서 첫 갱신을 실행해 주세요.'
+      : '데이터를 불러오지 못했습니다. 잠시 후 새로고침해 주세요. (' + e.message + ')';
+    m.hidden = false;
+  }
+  document.getElementById('lk-copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(location.href); document.getElementById('lk-copy').textContent = '링크를 복사했습니다'; } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

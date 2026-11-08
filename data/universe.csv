@@ -1,0 +1,519 @@
+﻿ticker,company,sector,sub_industry,theme,sp_weight,in_sp500,in_ndx100
+MMM,3M,산업재,Industrial Conglomerates,지주회사,0.13,Y,N
+AOS,A. O. Smith,산업재,Building Products,건자재·공조,0.01,Y,N
+ABT,Abbott Laboratories,헬스케어,Health Care Equipment,의료기기,0.28,Y,N
+ABBV,애브비,헬스케어,Biotechnology,바이오,0.74,Y,N
+ACN,Accenture,정보기술,IT Consulting & Other Services,IT 서비스,0.23,Y,N
+ADBE,Adobe,정보기술,Application Software,소프트웨어,0.14,Y,Y
+AMD,AMD,정보기술,Semiconductors,AI 반도체,1.11,Y,Y
+AES,AES Corporation,유틸리티,Independent Power Producers & Energy Traders,유틸리티,0.02,Y,N
+AFL,Aflac,금융,Life & Health Insurance,보험,0.09,Y,N
+A,Agilent Technologies,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.07,Y,N
+APD,Air Products,소재,Industrial Gases,화학,0.1,Y,N
+ABNB,Airbnb,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.15,Y,Y
+AKAM,Akamai Technologies,정보기술,Internet Services & Infrastructure,IT 서비스,0.02,Y,N
+ALB,Albemarle,소재,Specialty Chemicals,2차전지 소재,0.02,Y,N
+ARE,Alexandria Real Estate,부동산,Office REITs,리츠,0.01,Y,N
+ALGN,Align Technology,헬스케어,Health Care Supplies,의료기기,0.02,Y,N
+ALLE,Allegion,산업재,Building Products,건자재·공조,0.02,Y,N
+LNT,Alliant Energy,유틸리티,Electric Utilities,유틸리티,0.03,Y,N
+ALL,Allstate,금융,Property & Casualty Insurance,보험,0.1,Y,N
+GOOGL,알파벳,커뮤니케이션서비스,Interactive Media & Services,AI 빅테크,2.56,Y,Y
+GOOG,알파벳,커뮤니케이션서비스,Interactive Media & Services,AI 빅테크,2.42,Y,Y
+MO,Altria,필수소비재,Tobacco,필수소비재,0.19,Y,N
+AMZN,아마존,경기소비재,Broadline Retail,AI 빅테크,3.87,Y,Y
+AMCR,Amcor,소재,Paper & Plastic Packaging Products & Materials,포장재,0.03,Y,N
+AEE,Ameren,유틸리티,Multi-Utilities,유틸리티,0.04,Y,N
+AEP,American Electric Power,유틸리티,Electric Utilities,유틸리티,0.1,Y,Y
+AXP,American Express,금융,Consumer Finance,금융,0.32,Y,N
+AIG,American International Group,금융,Multi-line Insurance,보험,0.06,Y,N
+AMT,American Tower,부동산,Telecom Tower REITs,통신,0.13,Y,N
+AWK,American Water Works,유틸리티,Water Utilities,유틸리티,0.04,Y,N
+AMP,Ameriprise Financial,금융,Asset Management & Custody Banks,증권,0.06,Y,N
+AME,Ametek,산업재,Electrical Components & Equipment,전력기기,0.08,Y,N
+AMGN,Amgen,헬스케어,Biotechnology,제약·바이오,0.37,Y,Y
+APH,암페놀,정보기술,Electronic Components,AI 서버 부품,0.29,Y,N
+ADI,Analog Devices,정보기술,Semiconductors,반도체,0.29,Y,Y
+AON,Aon,금융,Insurance Brokers,보험,0.1,Y,N
+APA,APA Corporation,에너지,Oil & Gas Exploration & Production,정유·에너지,0.02,Y,N
+APO,Apollo Global Management,금융,Asset Management & Custody Banks,증권,0.1,Y,N
+AAPL,애플,정보기술,"Technology Hardware, Storage & Peripherals",애플 공급망,7.19,Y,Y
+AMAT,어플라이드머티어리얼즈,정보기술,Semiconductor Materials & Equipment,반도체 장비,0.43,Y,Y
+APP,AppLovin,커뮤니케이션서비스,Advertising,광고,0.11,Y,Y
+APTV,Aptiv,경기소비재,Automotive Parts & Equipment,자동차,0.01,Y,N
+ACGL,Arch Capital Group,금융,Property & Casualty Insurance,보험,0.05,Y,N
+ADM,Archer Daniels Midland,필수소비재,Agricultural Products & Services,필수소비재,0.05,Y,N
+ARES,Ares Management,금융,Asset Management & Custody Banks,증권,0.04,Y,N
+ANET,아리스타,정보기술,Communications Equipment,광통신,0.3,Y,N
+AJG,Arthur J. Gallagher,금융,Insurance Brokers,보험,0.1,Y,N
+AIZ,Assurant,금융,Multi-line Insurance,보험,0.02,Y,N
+T,AT&T,커뮤니케이션서비스,Integrated Telecommunication Services,통신,0.21,Y,N
+ATO,Atmos Energy,유틸리티,Gas Utilities,유틸리티,0.04,Y,N
+ADSK,Autodesk,정보기술,Application Software,소프트웨어,0.08,Y,Y
+ADP,Automatic Data Processing,산업재,Human Resource & Employment Services,IT 서비스,0.17,Y,Y
+AZO,AutoZone,경기소비재,Automotive Retail,자동차,0.08,Y,N
+AVY,Avery Dennison,소재,Paper & Plastic Packaging Products & Materials,포장재,0.02,Y,N
+AXON,Axon Enterprise,산업재,Aerospace & Defense,방산·항공,0.05,Y,Y
+BKR,Baker Hughes,에너지,Oil & Gas Equipment & Services,정유·에너지,0.08,Y,Y
+BALL,Ball Corporation,소재,"Metal, Glass & Plastic Containers",포장재,0.03,Y,N
+BAC,뱅크오브아메리카,금융,Diversified Banks,금융,0.5,Y,N
+BAX,Baxter International,헬스케어,Health Care Equipment,의료기기,0.02,Y,N
+BDX,Becton Dickinson,헬스케어,Health Care Equipment,의료기기,0.08,Y,N
+BRK.B,Berkshire Hathaway,금융,Multi-Sector Holdings,지주회사,1.73,Y,N
+BBY,Best Buy,경기소비재,Computer & Electronics Retail,유통,0.03,Y,N
+TECH,Bio-Techne,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.02,Y,N
+BIIB,Biogen,헬스케어,Biotechnology,제약·바이오,0.05,Y,N
+BLK,BlackRock,금융,Asset Management & Custody Banks,증권,0.26,Y,N
+BX,Blackstone,금융,Asset Management & Custody Banks,증권,0.14,Y,N
+XYZ,Block,금융,Transaction & Payment Processing Services,결제,0.07,Y,N
+BE,블룸에너지,산업재,Electrical Components & Equipment,연료전지,0.08,Y,N
+BNY,BNY Mellon,금융,Asset Management & Custody Banks,증권,0.14,Y,N
+BA,보잉,산업재,Aerospace & Defense,방산·항공,0.2,Y,N
+BKNG,Booking Holdings,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.17,Y,Y
+BSX,Boston Scientific,헬스케어,Health Care Equipment,의료기기,0.09,Y,N
+BMY,BMS,헬스케어,Pharmaceuticals,바이오,0.19,Y,N
+AVGO,브로드컴,정보기술,Semiconductors,AI 반도체,2.24,Y,Y
+BR,Broadridge Financial,산업재,Data Processing & Outsourced Services,IT 서비스,0.03,Y,N
+BRO,Brown & Brown,금융,Insurance Brokers,보험,0.03,Y,N
+BF.B,Brown-Forman,필수소비재,Distillers & Vintners,필수소비재,0.02,Y,N
+BG,Bunge Global,필수소비재,Agricultural Products & Services,필수소비재,0.03,Y,N
+BXP,BXP,부동산,Office REITs,리츠,0.01,Y,N
+CHRW,C.H. Robinson,산업재,Air Freight & Logistics,물류,0.02,Y,N
+CDNS,Cadence Design Systems,정보기술,Application Software,반도체 설계,0.13,Y,Y
+CPT,Camden Property Trust,부동산,Multi-Family Residential REITs,리츠,0.02,Y,N
+COF,Capital One,금융,Consumer Finance,금융,0.19,Y,N
+CAH,Cardinal Health,헬스케어,Health Care Distributors,헬스케어 서비스,0.09,Y,N
+CCL,Carnival,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.06,Y,N
+CARR,Carrier Global,산업재,Building Products,건자재·공조,0.07,Y,N
+CVNA,Carvana,경기소비재,Automotive Retail,자동차,0.12,Y,N
+CASY,Casey's,필수소비재,Food Retail,유통,0.04,Y,N
+CAT,캐터필러,산업재,Construction Machinery & Heavy Transportation Equipment,건설기계,0.41,Y,N
+CBOE,Cboe Global Markets,금융,Financial Exchanges & Data,증권,0.05,Y,N
+CBRE,CBRE Group,부동산,Real Estate Services,리츠,0.06,Y,N
+CDW,CDW,정보기술,Technology Distributors,IT 서비스,0.03,Y,N
+COR,Cencora,헬스케어,Health Care Distributors,헬스케어 서비스,0.09,Y,N
+CNC,Centene,헬스케어,Managed Health Care,헬스케어 서비스,0.05,Y,N
+CNP,CenterPoint Energy,유틸리티,Multi-Utilities,유틸리티,0.04,Y,N
+CF,CF Industries,소재,Fertilizers & Agricultural Chemicals,화학,0.03,Y,N
+CRL,Charles River Laboratories,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.02,Y,N
+SCHW,Charles Schwab,금융,Investment Banking & Brokerage,증권,0.22,Y,N
+CHTR,Charter Communications,커뮤니케이션서비스,Cable & Satellite,통신,0.02,Y,N
+CVX,셰브론,에너지,Integrated Oil & Gas,정유·에너지,0.65,Y,N
+CMG,Chipotle Mexican Grill,경기소비재,Restaurants,외식,0.06,Y,N
+CB,Chubb,금융,Property & Casualty Insurance,보험,0.21,Y,N
+CHD,Church & Dwight,필수소비재,Household Products,필수소비재,0.04,Y,N
+CIEN,Ciena,정보기술,Communications Equipment,광통신,0.06,Y,N
+CI,Cigna,헬스케어,Health Care Services,헬스케어 서비스,0.11,Y,N
+CINF,Cincinnati Financial,금융,Property & Casualty Insurance,보험,0.04,Y,N
+CTAS,Cintas,산업재,Diversified Support Services,산업 서비스,0.13,Y,Y
+CSCO,Cisco,정보기술,Communications Equipment,통신장비,0.58,Y,Y
+C,씨티,금융,Diversified Banks,금융,0.3,Y,N
+CFG,Citizens Financial Group,금융,Regional Banks,금융,0.04,Y,N
+CLX,Clorox,필수소비재,Household Products,필수소비재,0.02,Y,N
+CME,CME Group,금융,Financial Exchanges & Data,증권,0.16,Y,N
+CMS,CMS Energy,유틸리티,Multi-Utilities,유틸리티,0.03,Y,N
+KO,Coca-Cola,필수소비재,Soft Drinks & Non-alcoholic Beverages,필수소비재,0.6,Y,N
+CTSH,Cognizant,정보기술,IT Consulting & Other Services,IT 서비스,0.04,Y,N
+COHR,코히어런트,정보기술,Electronic Components,광통신,0.06,Y,N
+COIN,Coinbase,금융,Financial Exchanges & Data,증권,0.05,Y,N
+CL,Colgate-Palmolive,필수소비재,Household Products,필수소비재,0.11,Y,N
+CMCSA,Comcast,커뮤니케이션서비스,Cable & Satellite,통신,0.12,Y,Y
+FIX,Comfort Systems USA,산업재,Construction & Engineering,건설,0.06,Y,N
+COP,코노코필립스,에너지,Oil & Gas Exploration & Production,정유·에너지,0.26,Y,N
+ED,Consolidated Edison,유틸리티,Multi-Utilities,유틸리티,0.06,Y,N
+STZ,Constellation Brands,필수소비재,Distillers & Vintners,필수소비재,0.03,Y,N
+CEG,컨스텔레이션,유틸리티,Electric Utilities,원전·전력,0.13,Y,Y
+COO,Cooper Companies,헬스케어,Health Care Supplies,의료기기,0.02,Y,N
+CPRT,Copart,산업재,Diversified Support Services,산업 서비스,0.04,Y,Y
+GLW,코닝,정보기술,Electronic Components,광통신,0.15,Y,N
+CPAY,Corpay,금융,Transaction & Payment Processing Services,결제,0.04,Y,N
+CSGP,CoStar Group,부동산,Real Estate Services,리츠,0.02,Y,N
+COST,코스트코,필수소비재,Consumer Staples Merchandise Retail,유통·K뷰티,0.67,Y,Y
+CRH,CRH,소재,Construction Materials,건자재·공조,0.09,Y,N
+CRWD,크라우드스트라이크,정보기술,Systems Software,보안,0.36,Y,Y
+CCI,Crown Castle,부동산,Telecom Tower REITs,통신,0.05,Y,N
+CSX,CSX,산업재,Rail Transportation,물류,0.14,Y,Y
+CMI,Cummins,산업재,Construction Machinery & Heavy Transportation Equipment,건설기계,0.1,Y,N
+CVS,CVS Health,헬스케어,Health Care Services,헬스케어 서비스,0.16,Y,N
+DHR,Danaher,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.23,Y,N
+DRI,Darden Restaurants,경기소비재,Restaurants,외식,0.04,Y,N
+DDOG,Datadog,정보기술,Application Software,소프트웨어,0.11,Y,Y
+DVA,DaVita,헬스케어,Health Care Services,헬스케어 서비스,0.02,Y,N
+DECK,Deckers Brands,경기소비재,Footwear,의류·패션,0.02,Y,N
+DE,디어,산업재,Agricultural & Farm Machinery,건설기계,0.26,Y,N
+DELL,델,정보기술,"Technology Hardware, Storage & Peripherals",AI 서버 부품,0.36,Y,N
+DAL,델타항공,산업재,Passenger Airlines,항공사,0.08,Y,N
+DVN,Devon Energy,에너지,Oil & Gas Exploration & Production,정유·에너지,0.08,Y,N
+DXCM,Dexcom,헬스케어,Health Care Equipment,의료기기,0.05,Y,Y
+FANG,Diamondback Energy,에너지,Oil & Gas Exploration & Production,정유·에너지,0.08,Y,Y
+DLR,Digital Realty,부동산,Data Center REITs,데이터센터,0.1,Y,N
+DG,Dollar General,필수소비재,Consumer Staples Merchandise Retail,유통,0.04,Y,N
+DLTR,Dollar Tree,필수소비재,Consumer Staples Merchandise Retail,유통,0.04,Y,N
+D,Dominion Energy,유틸리티,Multi-Utilities,유틸리티,0.09,Y,N
+DPZ,Domino's,경기소비재,Restaurants,외식,0.02,Y,N
+DASH,DoorDash,경기소비재,Specialized Consumer Services,인터넷 플랫폼,0.12,Y,Y
+DOV,Dover,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.04,Y,N
+DOW,Dow,소재,Commodity Chemicals,화학,0.04,Y,N
+DHI,D. R. Horton,경기소비재,Homebuilding,건설,0.06,Y,N
+DTE,DTE Energy,유틸리티,Multi-Utilities,유틸리티,0.04,Y,N
+DUK,듀크에너지,유틸리티,Electric Utilities,유틸리티,0.15,Y,N
+DD,DuPont,산업재,Industrial Conglomerates,지주회사,0.03,Y,N
+ETN,이튼,산업재,Electrical Components & Equipment,전력기기,0.21,Y,N
+EBAY,eBay,경기소비재,Broadline Retail,유통,0.08,Y,N
+ECHO,EchoStar,커뮤니케이션서비스,Wireless Telecommunication Services,통신,0.04,Y,N
+ECL,Ecolab,소재,Specialty Chemicals,화학,0.13,Y,N
+EIX,Edison International,유틸리티,Electric Utilities,유틸리티,0.03,Y,N
+EW,Edwards Lifesciences,헬스케어,Health Care Equipment,의료기기,0.08,Y,N
+ELV,Elevance Health,헬스케어,Managed Health Care,헬스케어 서비스,0.13,Y,N
+EME,Emcor,산업재,Construction & Engineering,건설,0.04,Y,N
+EMR,Emerson Electric,산업재,Electrical Components & Equipment,전력기기,0.13,Y,N
+ETR,Entergy,유틸리티,Electric Utilities,유틸리티,0.08,Y,N
+EOG,EOG Resources,에너지,Oil & Gas Exploration & Production,정유·에너지,0.12,Y,N
+EQT,EQT,에너지,Oil & Gas Exploration & Production,정유·에너지,0.05,Y,N
+EFX,Equifax,산업재,Research & Consulting Services,IT 서비스,0.03,Y,N
+EQIX,Equinix,부동산,Data Center REITs,데이터센터,0.14,Y,N
+ERIE,Erie Indemnity,금융,Insurance Brokers,보험,0.02,Y,N
+ESS,Essex Property Trust,부동산,Multi-Family Residential REITs,리츠,0.02,Y,N
+EL,Estée Lauder,필수소비재,Personal Care Products,화장품·K뷰티,0.06,Y,N
+EG,Everest Group,금융,Reinsurance,보험,0.02,Y,N
+EVRG,Evergy,유틸리티,Electric Utilities,유틸리티,0.03,Y,N
+P,Everpure,정보기술,"Technology Hardware, Storage & Peripherals",메모리,0.06,Y,N
+ES,Eversource Energy,유틸리티,Electric Utilities,유틸리티,0.04,Y,N
+EXC,Exelon,유틸리티,Electric Utilities,유틸리티,0.07,Y,Y
+EXE,Expand Energy,에너지,Oil & Gas Exploration & Production,정유·에너지,0.03,Y,N
+EXPE,Expedia Group,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.05,Y,N
+EXPD,Expeditors International,산업재,Air Freight & Logistics,물류,0.04,Y,N
+EXR,Extra Space Storage,부동산,Self-Storage REITs,리츠,0.05,Y,N
+XOM,엑슨모빌,에너지,Integrated Oil & Gas,정유·에너지,1.07,Y,N
+FFIV,F5,정보기술,Communications Equipment,통신장비,0.03,Y,N
+FDS,FactSet,금융,Financial Exchanges & Data,증권,0.02,Y,N
+FICO,Fair Isaac,정보기술,Application Software,소프트웨어,0.02,Y,N
+FAST,Fastenal,산업재,Trading Companies & Distributors,산업재 유통,0.09,Y,Y
+FRT,Federal Realty,부동산,Retail REITs,리츠,0.01,Y,N
+FDX,FedEx,산업재,Air Freight & Logistics,물류,0.11,Y,N
+FDXF,FedEx Freight,산업재,Cargo Ground Transportation,물류,0.03,Y,N
+FERG,Ferguson Enterprises,산업재,Trading Companies & Distributors,산업재 유통,0.07,Y,N
+FIS,Fidelity National Information Services,금융,Transaction & Payment Processing Services,결제,0.03,Y,N
+FITB,Fifth Third Bancorp,금융,Regional Banks,금융,0.07,Y,N
+FSLR,First Solar,정보기술,Semiconductors,태양광,0.03,Y,N
+FE,FirstEnergy,유틸리티,Electric Utilities,유틸리티,0.04,Y,N
+FISV,Fiserv,금융,Transaction & Payment Processing Services,결제,0.04,Y,N
+FLEX,Flex,정보기술,Electronic Manufacturing Services,전자부품,0.05,Y,N
+F,포드,경기소비재,Automobile Manufacturers,자동차·로봇,0.07,Y,N
+FTNT,포티넷,정보기술,Systems Software,보안,0.13,Y,Y
+FTV,Fortive,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.03,Y,N
+FOXA,Fox Corporation (Class A),커뮤니케이션서비스,Broadcasting,콘텐츠·엔터,0.02,Y,N
+FOX,Fox Corporation (Class B),커뮤니케이션서비스,Broadcasting,콘텐츠·엔터,0.02,Y,N
+BEN,Franklin Resources,금융,Asset Management & Custody Banks,증권,0.02,Y,N
+FCX,프리포트맥모란,소재,Copper,구리,0.13,Y,N
+GRMN,Garmin,경기소비재,Consumer Electronics,가전,0.08,Y,N
+IT,Gartner,정보기술,IT Consulting & Other Services,IT 서비스,0.02,Y,N
+GE,GE에어로스페이스,산업재,Aerospace & Defense,방산·항공,0.48,Y,N
+GEHC,GE HealthCare,헬스케어,Health Care Equipment,의료기기,0.05,Y,Y
+GEV,GE버노바,산업재,Heavy Electrical Equipment,전력기기,0.33,Y,N
+GEN,Gen Digital,정보기술,Systems Software,소프트웨어,0.03,Y,N
+GNRC,Generac,산업재,Heavy Electrical Equipment,전력기기,0.02,Y,N
+GD,제너럴다이내믹스,산업재,Aerospace & Defense,조선,0.15,Y,N
+GIS,General Mills,필수소비재,Packaged Foods & Meats,필수소비재,0.03,Y,N
+GM,GM,경기소비재,Automobile Manufacturers,자동차·로봇,0.11,Y,N
+GPC,Genuine Parts,경기소비재,Distributors,자동차,0.03,Y,N
+GILD,Gilead Sciences,헬스케어,Biotechnology,제약·바이오,0.31,Y,Y
+GPN,Global Payments,금융,Transaction & Payment Processing Services,결제,0.04,Y,N
+GL,Globe Life,금융,Life & Health Insurance,보험,0.02,Y,N
+GDDY,GoDaddy,정보기술,Internet Services & Infrastructure,IT 서비스,0.02,Y,N
+GS,Goldman Sachs,금융,Investment Banking & Brokerage,증권,0.38,Y,N
+HAL,Halliburton,에너지,Oil & Gas Equipment & Services,정유·에너지,0.04,Y,N
+HIG,Hartford,금융,Property & Casualty Insurance,보험,0.05,Y,N
+HAS,Hasbro,경기소비재,Leisure Products,레저,0.02,Y,N
+HCA,HCA Healthcare,헬스케어,Health Care Facilities,헬스케어 서비스,0.14,Y,N
+DOC,Healthpeak Properties,부동산,Health Care REITs,리츠,0.02,Y,N
+HSIC,Henry Schein,헬스케어,Health Care Distributors,헬스케어 서비스,0.01,Y,N
+HSY,Hershey,필수소비재,Packaged Foods & Meats,필수소비재,0.05,Y,N
+HPE,Hewlett Packard Enterprise,정보기술,"Technology Hardware, Storage & Peripherals",AI 서버 부품,0.1,Y,N
+HLT,Hilton Worldwide,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.12,Y,N
+HD,Home Depot,경기소비재,Home Improvement Retail,인테리어,0.5,Y,N
+HONA,Honeywell Aerospace,산업재,Aerospace & Defense,방산·항공,0.07,Y,Y
+HON,Honeywell Technologies,산업재,Industrial Conglomerates,지주회사,0.1,Y,Y
+HRL,Hormel Foods,필수소비재,Packaged Foods & Meats,필수소비재,0.02,Y,N
+HST,Host Hotels & Resorts,부동산,Hotel & Resort REITs,리츠,0.03,Y,N
+HWM,Howmet Aerospace,산업재,Aerospace & Defense,방산·항공,0.12,Y,N
+HPQ,HP Inc.,정보기술,"Technology Hardware, Storage & Peripherals",IT 하드웨어,0.04,Y,N
+HUBB,Hubbell,산업재,Industrial Machinery & Supplies & Components,전력기기,0.03,Y,N
+HUM,Humana,헬스케어,Managed Health Care,헬스케어 서비스,0.07,Y,N
+HBAN,Huntington Bancshares,금융,Regional Banks,금융,0.05,Y,N
+HII,Huntington Ingalls Industries,산업재,Aerospace & Defense,조선,0.02,Y,N
+IBM,IBM,정보기술,IT Consulting & Other Services,IT 서비스,0.35,Y,N
+IEX,IDEX,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.03,Y,N
+IDXX,Idexx Laboratories,헬스케어,Health Care Equipment,의료기기,0.08,Y,Y
+ITW,Illinois Tool Works,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.12,Y,N
+ILMN,Illumina,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.05,Y,N
+INCY,Incyte,헬스케어,Biotechnology,제약·바이오,0.04,Y,N
+IR,Ingersoll Rand,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.05,Y,N
+PODD,Insulet,헬스케어,Health Care Equipment,의료기기,0.02,Y,N
+INTC,Intel,정보기술,Semiconductors,반도체,0.46,Y,Y
+IBKR,Interactive Brokers,금융,Investment Banking & Brokerage,증권,0.05,Y,N
+ICE,Intercontinental Exchange,금융,Financial Exchanges & Data,증권,0.14,Y,N
+IFF,International Flavors & Fragrances,소재,Specialty Chemicals,화학,0.04,Y,N
+IP,International Paper,소재,Paper & Plastic Packaging Products & Materials,포장재,0.03,Y,N
+INTU,Intuit,정보기술,Application Software,소프트웨어,0.14,Y,Y
+ISRG,Intuitive Surgical,헬스케어,Health Care Equipment,의료기기,0.22,Y,Y
+IVZ,Invesco,금융,Asset Management & Custody Banks,증권,0.02,Y,N
+INVH,Invitation Homes,부동산,Single-Family Residential REITs,리츠,0.02,Y,N
+IQV,IQVIA,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.06,Y,N
+IRM,Iron Mountain,부동산,Other Specialized REITs,리츠,0.05,Y,N
+JBHT,J.B. Hunt,산업재,Cargo Ground Transportation,물류,0.03,Y,N
+JBL,Jabil,정보기술,Electronic Manufacturing Services,전자부품,0.04,Y,N
+JKHY,Jack Henry & Associates,금융,Transaction & Payment Processing Services,결제,0.02,Y,N
+J,Jacobs Solutions,산업재,Construction & Engineering,건설,0.03,Y,N
+JNJ,존슨앤드존슨,헬스케어,Pharmaceuticals,바이오,0.95,Y,N
+JCI,Johnson Controls,산업재,Building Products,건자재·공조,0.13,Y,N
+JPM,JP모건,금융,Diversified Banks,금융,1.32,Y,N
+KVUE,Kenvue,필수소비재,Personal Care Products,화장품·K뷰티,0.05,Y,N
+KDP,Keurig Dr Pepper,필수소비재,Soft Drinks & Non-alcoholic Beverages,필수소비재,0.07,Y,Y
+KEY,KeyCorp,금융,Regional Banks,금융,0.03,Y,N
+KEYS,Keysight Technologies,정보기술,Electronic Equipment & Instruments,전자부품,0.07,Y,N
+KMB,Kimberly-Clark,필수소비재,Household Products,필수소비재,0.05,Y,N
+KIM,Kimco Realty,부동산,Retail REITs,리츠,0.02,Y,N
+KMI,Kinder Morgan,에너지,Oil & Gas Storage & Transportation,정유·에너지,0.11,Y,N
+KKR,KKR,금융,Asset Management & Custody Banks,증권,0.13,Y,N
+KLAC,KLA,정보기술,Semiconductor Materials & Equipment,반도체 장비,0.29,Y,Y
+KHC,Kraft Heinz,필수소비재,Packaged Foods & Meats,필수소비재,0.04,Y,N
+KR,Kroger,필수소비재,Food Retail,유통,0.06,Y,N
+LHX,L3Harris,산업재,Aerospace & Defense,방산·항공,0.08,Y,N
+LH,Labcorp,헬스케어,Health Care Services,헬스케어 서비스,0.04,Y,N
+LRCX,램리서치,정보기술,Semiconductor Materials & Equipment,반도체 장비,0.41,Y,Y
+LVS,Las Vegas Sands,경기소비재,Casinos & Gaming,카지노,0.04,Y,N
+LDOS,Leidos,산업재,Diversified Support Services,방산·항공,0.03,Y,N
+LEN,Lennar,경기소비재,Homebuilding,건설,0.03,Y,N
+LII,Lennox International,산업재,Building Products,건자재·공조,0.02,Y,N
+LLY,일라이릴리,헬스케어,Pharmaceuticals,바이오,1.83,Y,N
+LIN,Linde,소재,Industrial Gases,화학,0.35,Y,Y
+LYV,Live Nation Entertainment,커뮤니케이션서비스,Movies & Entertainment,콘텐츠·엔터,0.06,Y,N
+LMT,록히드마틴,산업재,Aerospace & Defense,방산·항공,0.22,Y,N
+L,Loews,금융,Multi-line Insurance,보험,0.03,Y,N
+LOW,Lowe's,경기소비재,Home Improvement Retail,인테리어,0.18,Y,N
+LULU,Lululemon Athletica,경기소비재,"Apparel, Accessories & Luxury Goods",의류·패션,0.02,Y,N
+LITE,루멘텀,정보기술,Communications Equipment,광통신,0.09,Y,Y
+LYB,LyondellBasell,소재,Specialty Chemicals,화학,0.03,Y,N
+MTB,M&T Bank,금융,Regional Banks,금융,0.05,Y,N
+MPC,마라톤페트롤리엄,에너지,Oil & Gas Refining & Marketing,정유·에너지,0.18,Y,N
+MAR,Marriott International,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.16,Y,Y
+MRSH,Marsh McLennan,금융,Insurance Brokers,보험,0.14,Y,N
+MLM,Martin Marietta Materials,소재,Construction Materials,건자재·공조,0.06,Y,N
+MRVL,마벨,정보기술,Semiconductors,AI 서버 부품,0.22,Y,Y
+MAS,Masco,산업재,Building Products,건자재·공조,0.02,Y,N
+MA,Mastercard,금융,Transaction & Payment Processing Services,결제,0.83,Y,N
+MKC,McCormick,필수소비재,Packaged Foods & Meats,필수소비재,0.02,Y,N
+MCD,McDonald's,경기소비재,Restaurants,외식,0.27,Y,N
+MCK,McKesson,헬스케어,Health Care Distributors,헬스케어 서비스,0.17,Y,N
+MDT,Medtronic,헬스케어,Health Care Equipment,의료기기,0.18,Y,N
+MRK,머크,헬스케어,Pharmaceuticals,바이오,0.53,Y,N
+META,메타,커뮤니케이션서비스,Interactive Media & Services,AI 빅테크,2.3,Y,Y
+MET,MetLife,금융,Life & Health Insurance,보험,0.09,Y,N
+MTD,Mettler Toledo,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.05,Y,N
+MGM,MGM Resorts,경기소비재,Casinos & Gaming,카지노,0.01,Y,N
+MCHP,Microchip Technology,정보기술,Semiconductors,반도체,0.06,Y,Y
+MU,마이크론,정보기술,Semiconductors,메모리,1.37,Y,Y
+MSFT,마이크로소프트,정보기술,Systems Software,AI 빅테크,5.48,Y,Y
+MAA,Mid-America Apartment,부동산,Multi-Family Residential REITs,리츠,0.02,Y,N
+MRNA,Moderna,헬스케어,Biotechnology,제약·바이오,0.13,Y,Y
+MDLZ,Mondelez International,필수소비재,Packaged Foods & Meats,필수소비재,0.12,Y,Y
+MPWR,Monolithic Power Systems,정보기술,Semiconductors,반도체,0.09,Y,Y
+MNST,Monster Beverage,필수소비재,Soft Drinks & Non-alcoholic Beverages,필수소비재,0.14,Y,Y
+MCO,Moody's,금융,Financial Exchanges & Data,증권,0.13,Y,N
+MS,Morgan Stanley,금융,Investment Banking & Brokerage,증권,0.42,Y,N
+MOS,Mosaic,소재,Fertilizers & Agricultural Chemicals,화학,0.01,Y,N
+MSI,Motorola Solutions,정보기술,Communications Equipment,통신장비,0.12,Y,N
+MSCI,MSCI,금융,Financial Exchanges & Data,증권,0.07,Y,N
+NDAQ,Nasdaq,금융,Financial Exchanges & Data,증권,0.09,Y,N
+NTAP,NetApp,정보기술,"Technology Hardware, Storage & Peripherals",메모리,0.05,Y,N
+NFLX,넷플릭스,커뮤니케이션서비스,Movies & Entertainment,콘텐츠,0.38,Y,Y
+NEM,Newmont,소재,Gold,비철금속,0.17,Y,N
+NWSA,News Corp (Class A),커뮤니케이션서비스,Publishing,콘텐츠·엔터,0.02,Y,N
+NWS,News Corp (Class B),커뮤니케이션서비스,Publishing,콘텐츠·엔터,0.01,Y,N
+NEE,넥스트에라,유틸리티,Multi-Utilities,유틸리티,0.26,Y,N
+NKE,Nike,경기소비재,"Apparel, Accessories & Luxury Goods",의류·패션,0.08,Y,N
+NI,NiSource,유틸리티,Multi-Utilities,유틸리티,0.03,Y,N
+NDSN,Nordson,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.03,Y,N
+NSC,Norfolk Southern,산업재,Rail Transportation,물류,0.11,Y,N
+NTRS,Northern Trust,금융,Asset Management & Custody Banks,증권,0.05,Y,N
+NOC,Northrop Grumman,산업재,Aerospace & Defense,방산·항공,0.11,Y,N
+NCLH,Norwegian Cruise Line,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.01,Y,N
+NRG,NRG Energy,유틸리티,Independent Power Producers & Energy Traders,유틸리티,0.03,Y,N
+NUE,Nucor,소재,Steel,철강,0.09,Y,N
+NVDA,엔비디아,정보기술,Semiconductors,AI 반도체,7.1,Y,Y
+NVR,NVR,경기소비재,Homebuilding,건설,0.02,Y,N
+NXPI,NXP Semiconductors,정보기술,Semiconductors,반도체,0.09,Y,Y
+ORLY,O'Reilly Automotive,경기소비재,Automotive Retail,자동차,0.11,Y,Y
+OXY,Occidental Petroleum,에너지,Oil & Gas Exploration & Production,정유·에너지,0.09,Y,N
+ODFL,Old Dominion,산업재,Cargo Ground Transportation,물류,0.05,Y,Y
+OMC,Omnicom Group,커뮤니케이션서비스,Advertising,광고,0.03,Y,N
+ON,ON Semiconductor,정보기술,Semiconductors,반도체,0.04,Y,N
+OKE,Oneok,에너지,Oil & Gas Storage & Transportation,정유·에너지,0.08,Y,N
+ORCL,오라클,정보기술,Application Software,AI 빅테크,0.53,Y,N
+OTIS,Otis Worldwide,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.04,Y,N
+PCAR,Paccar,산업재,Construction Machinery & Heavy Transportation Equipment,자동차,0.08,Y,Y
+PKG,Packaging Corp of America,소재,Paper & Plastic Packaging Products & Materials,포장재,0.03,Y,N
+PLTR,Palantir Technologies,정보기술,Application Software,소프트웨어,0.62,Y,Y
+PANW,팔로알토,정보기술,Systems Software,보안,0.42,Y,Y
+PH,Parker Hannifin,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.17,Y,N
+PAYX,Paychex,산업재,Human Resource & Employment Services,IT 서비스,0.06,Y,Y
+PYPL,PayPal,금융,Transaction & Payment Processing Services,결제,0.07,Y,Y
+PNR,Pentair,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.02,Y,N
+PEP,PepsiCo,필수소비재,Soft Drinks & Non-alcoholic Beverages,필수소비재,0.28,Y,Y
+PFE,화이자,헬스케어,Pharmaceuticals,바이오,0.25,Y,N
+PCG,PG&E,유틸리티,Multi-Utilities,유틸리티,0.06,Y,N
+PM,Philip Morris International,필수소비재,Tobacco,필수소비재,0.47,Y,N
+PSX,필립스66,에너지,Oil & Gas Refining & Marketing,정유·에너지,0.16,Y,N
+PNW,Pinnacle West Capital,유틸리티,Multi-Utilities,유틸리티,0.02,Y,N
+PNC,PNC Financial Services,금융,Diversified Banks,금융,0.13,Y,N
+PPG,PPG Industries,소재,Specialty Chemicals,화학,0.04,Y,N
+PPL,PPL,유틸리티,Electric Utilities,유틸리티,0.04,Y,N
+PFG,Principal Financial Group,금융,Life & Health Insurance,보험,0.03,Y,N
+PG,Procter & Gamble,필수소비재,Personal Care Products,화장품·K뷰티,0.55,Y,N
+PGR,Progressive,금융,Property & Casualty Insurance,보험,0.2,Y,N
+PLD,Prologis,부동산,Industrial REITs,리츠,0.18,Y,N
+PRU,Prudential Financial,금융,Life & Health Insurance,보험,0.06,Y,N
+PTC,PTC,정보기술,Application Software,소프트웨어,0.03,Y,N
+PEG,Public Service Enterprise Group,유틸리티,Electric Utilities,유틸리티,0.05,Y,N
+PSA,Public Storage,부동산,Self-Storage REITs,리츠,0.09,Y,N
+PHM,PulteGroup,경기소비재,Homebuilding,건설,0.04,Y,N
+Q,큐니티,정보기술,Semiconductor Materials & Equipment,반도체 소재,0.04,Y,N
+QCOM,Qualcomm,정보기술,Semiconductors,반도체,0.25,Y,Y
+PWR,콴타서비스,산업재,Construction & Engineering,전력기기,0.14,Y,N
+DGX,Quest Diagnostics,헬스케어,Health Care Services,헬스케어 서비스,0.04,Y,N
+RL,Ralph Lauren,경기소비재,"Apparel, Accessories & Luxury Goods",의류·패션,0.03,Y,N
+RJF,Raymond James Financial,금융,Investment Banking & Brokerage,증권,0.05,Y,N
+RDDT,Reddit,커뮤니케이션서비스,Interactive Media & Services,인터넷 플랫폼,0.03,Y,N
+O,Realty Income,부동산,Retail REITs,리츠,0.08,Y,N
+REG,Regency Centers,부동산,Retail REITs,리츠,0.02,Y,N
+REGN,Regeneron Pharmaceuticals,헬스케어,Biotechnology,제약·바이오,0.14,Y,Y
+RF,Regions Financial,금융,Regional Banks,금융,0.04,Y,N
+RSG,Republic Services,산업재,Environmental & Facilities Services,산업 서비스,0.11,Y,N
+RMD,ResMed,헬스케어,Health Care Equipment,의료기기,0.05,Y,N
+RVTY,Revvity,헬스케어,Health Care Equipment,의료기기,0.02,Y,N
+HOOD,Robinhood Markets,금융,Investment Banking & Brokerage,증권,0.11,Y,N
+ROK,Rockwell Automation,산업재,Electrical Components & Equipment,전력기기,0.07,Y,N
+ROL,Rollins,산업재,Environmental & Facilities Services,산업 서비스,0.03,Y,N
+ROP,Roper Technologies,정보기술,Electronic Equipment & Instruments,전자부품,0.07,Y,Y
+ROST,Ross Stores,경기소비재,Apparel Retail,유통,0.11,Y,Y
+RCL,Royal Caribbean Group,경기소비재,"Hotels, Resorts & Cruise Lines",여행·레저,0.13,Y,N
+RTX,RTX,산업재,Aerospace & Defense,방산·항공,0.4,Y,N
+SPGI,S&P Global,금융,Financial Exchanges & Data,증권,0.2,Y,N
+CRM,Salesforce,정보기술,Application Software,소프트웨어,0.27,Y,N
+SNDK,샌디스크,정보기술,"Technology Hardware, Storage & Peripherals",메모리,0.23,Y,Y
+SBAC,SBA Communications,부동산,Telecom Tower REITs,통신,0.03,Y,N
+SLB,Schlumberger,에너지,Oil & Gas Equipment & Services,정유·에너지,0.11,Y,N
+STX,시게이트,정보기술,"Technology Hardware, Storage & Peripherals",메모리,0.2,Y,Y
+SRE,Sempra,유틸리티,Multi-Utilities,유틸리티,0.08,Y,N
+NOW,ServiceNow,정보기술,Systems Software,소프트웨어,0.16,Y,N
+SHW,Sherwin-Williams,소재,Specialty Chemicals,화학,0.12,Y,N
+SPG,Simon Property Group,부동산,Retail REITs,리츠,0.1,Y,N
+SKYD,Skydance,커뮤니케이션서비스,Movies & Entertainment,콘텐츠·엔터,0.06,Y,N
+SWKS,Skyworks Solutions,정보기술,Semiconductors,반도체,0.03,Y,N
+SJM,J.M. Smucker,필수소비재,Packaged Foods & Meats,필수소비재,0.02,Y,N
+SW,Smurfit Westrock,소재,Paper & Plastic Packaging Products & Materials,포장재,0.03,Y,N
+SNA,Snap-on,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.03,Y,N
+SOLV,Solventum,헬스케어,Health Care Technology,헬스케어 서비스,0.02,Y,N
+SO,서던,유틸리티,Electric Utilities,유틸리티,0.16,Y,N
+LUV,Southwest Airlines,산업재,Passenger Airlines,항공사,0.03,Y,N
+SWK,Stanley Black & Decker,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.02,Y,N
+SBUX,Starbucks,경기소비재,Restaurants,외식,0.17,Y,Y
+STT,State Street,금융,Asset Management & Custody Banks,증권,0.07,Y,N
+STLD,Steel Dynamics,소재,Steel,철강,0.05,Y,N
+STE,Steris,헬스케어,Health Care Equipment,의료기기,0.03,Y,N
+SYK,Stryker,헬스케어,Health Care Equipment,의료기기,0.17,Y,N
+SMCI,Supermicro,정보기술,"Technology Hardware, Storage & Peripherals",AI 서버 부품,0.03,Y,N
+SYF,Synchrony Financial,금융,Consumer Finance,금융,0.04,Y,N
+SNPS,Synopsys,정보기술,Application Software,반도체 설계,0.13,Y,Y
+SYY,Sysco,필수소비재,Food Distributors,필수소비재,0.06,Y,N
+TMUS,T-Mobile US,커뮤니케이션서비스,Wireless Telecommunication Services,통신,0.25,Y,Y
+TROW,T. Rowe Price,금융,Asset Management & Custody Banks,증권,0.03,Y,N
+TTWO,Take-Two Interactive,커뮤니케이션서비스,Interactive Home Entertainment,게임,0.05,Y,Y
+TPR,Tapestry,경기소비재,"Apparel, Accessories & Luxury Goods",의류·패션,0.03,Y,N
+TRGP,Targa Resources,에너지,Oil & Gas Storage & Transportation,정유·에너지,0.09,Y,N
+TGT,타깃,필수소비재,Consumer Staples Merchandise Retail,유통·K뷰티,0.1,Y,N
+TEL,TE Connectivity,정보기술,Electronic Manufacturing Services,전자부품,0.09,Y,N
+TDY,Teledyne Technologies,정보기술,Electronic Equipment & Instruments,전자부품,0.04,Y,N
+TER,테라다인,정보기술,Semiconductor Materials & Equipment,반도체 테스트,0.06,Y,Y
+TSLA,테슬라,경기소비재,Automobile Manufacturers,자동차·로봇,2.32,Y,Y
+TXN,Texas Instruments,정보기술,Semiconductors,반도체,0.4,Y,Y
+TPL,Texas Pacific Land,에너지,Oil & Gas Exploration & Production,정유·에너지,0.03,Y,N
+TXT,Textron,산업재,Aerospace & Defense,방산·항공,0.02,Y,N
+TMO,Thermo Fisher Scientific,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.37,Y,N
+TJX,TJX Companies,경기소비재,Apparel Retail,유통,0.23,Y,N
+TKO,TKO Group Holdings,커뮤니케이션서비스,Movies & Entertainment,콘텐츠·엔터,0.02,Y,N
+TSCO,Tractor Supply,경기소비재,Other Specialty Retail,유통,0.03,Y,N
+TT,Trane Technologies,산업재,Building Products,건자재·공조,0.13,Y,N
+TDG,TransDigm Group,산업재,Aerospace & Defense,방산·항공,0.1,Y,N
+TRV,Travelers,금융,Property & Casualty Insurance,보험,0.12,Y,N
+TRMB,Trimble,정보기술,Application Software,소프트웨어,0.02,Y,N
+TFC,Truist Financial,금융,Diversified Banks,금융,0.09,Y,N
+TWLO,Twilio,정보기술,Systems Software,소프트웨어,0.05,Y,N
+TYL,Tyler Technologies,정보기술,Application Software,소프트웨어,0.02,Y,N
+TSN,Tyson Foods,필수소비재,Packaged Foods & Meats,필수소비재,0.03,Y,N
+USB,U.S. Bancorp,금융,Diversified Banks,금융,0.14,Y,N
+UBER,Uber,산업재,Passenger Ground Transportation,인터넷 플랫폼,0.2,Y,N
+UDR,UDR,부동산,Multi-Family Residential REITs,리츠,0.02,Y,N
+ULTA,Ulta Beauty,경기소비재,Other Specialty Retail,화장품·K뷰티,0.04,Y,N
+UNP,Union Pacific,산업재,Rail Transportation,물류,0.27,Y,N
+UAL,United Airlines,산업재,Passenger Airlines,항공사,0.05,Y,N
+UPS,United Parcel Service,산업재,Air Freight & Logistics,물류,0.14,Y,N
+URI,United Rentals,산업재,Trading Companies & Distributors,건설기계,0.11,Y,N
+UNH,UnitedHealth Group,헬스케어,Managed Health Care,헬스케어 서비스,0.52,Y,N
+UHS,Universal Health Services,헬스케어,Health Care Facilities,헬스케어 서비스,0.02,Y,N
+VLO,발레로,에너지,Oil & Gas Refining & Marketing,정유·에너지,0.15,Y,N
+VEEV,Veeva Systems,헬스케어,Health Care Technology,헬스케어 서비스,0.07,Y,N
+VTR,Ventas,부동산,Health Care REITs,리츠,0.07,Y,N
+VLTO,Veralto,산업재,Environmental & Facilities Services,산업 서비스,0.04,Y,N
+VRSN,Verisign,정보기술,Internet Services & Infrastructure,IT 서비스,0.04,Y,N
+VRSK,Verisk Analytics,산업재,Research & Consulting Services,IT 서비스,0.04,Y,N
+VZ,Verizon,커뮤니케이션서비스,Integrated Telecommunication Services,통신,0.27,Y,N
+VRTX,Vertex Pharmaceuticals,헬스케어,Biotechnology,제약·바이오,0.2,Y,Y
+VRT,버티브,산업재,Electrical Components & Equipment,전력기기,0.13,Y,N
+VTRS,Viatris,헬스케어,Pharmaceuticals,제약·바이오,0.03,Y,N
+VICI,Vici Properties,부동산,Hotel & Resort REITs,리츠,0.04,Y,N
+V,Visa,금융,Transaction & Payment Processing Services,결제,1.16,Y,N
+VST,비스트라,유틸리티,Electric Utilities,원전·전력,0.07,Y,N
+VMRK,Vivmark Residential,부동산,Multi-Family Residential REITs,리츠,0.07,Y,N
+VMC,Vulcan Materials,소재,Construction Materials,건자재·공조,0.05,Y,N
+VYLR,Vylor,필수소비재,Agricultural Products & Services,필수소비재,0.07,Y,N
+WRB,W. R. Berkley,금융,Property & Casualty Insurance,보험,0.04,Y,N
+GWW,W. W. Grainger,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.09,Y,N
+WAB,Wabtec,산업재,Construction Machinery & Heavy Transportation Equipment,물류,0.07,Y,N
+WMT,월마트,필수소비재,Consumer Staples Merchandise Retail,유통·K뷰티,1.47,Y,Y
+DIS,디즈니,커뮤니케이션서비스,Movies & Entertainment,콘텐츠,0.28,Y,N
+WM,Waste Management,산업재,Environmental & Facilities Services,산업 서비스,0.14,Y,N
+WAT,Waters,헬스케어,Life Sciences Tools & Services,바이오 소부장,0.06,Y,N
+WEC,WEC Energy Group,유틸리티,Electric Utilities,유틸리티,0.06,Y,N
+WFC,웰스파고,금융,Diversified Banks,금융,0.38,Y,N
+WELL,Welltower,부동산,Health Care REITs,리츠,0.26,Y,N
+WST,West Pharmaceutical Services,헬스케어,Health Care Supplies,의료기기,0.04,Y,N
+WDC,웨스턴디지털,정보기술,"Technology Hardware, Storage & Peripherals",메모리,0.18,Y,Y
+WY,Weyerhaeuser,부동산,Timber REITs,리츠,0.02,Y,N
+WSM,Williams-Sonoma,경기소비재,Homefurnishing Retail,인테리어,0.04,Y,N
+WMB,Williams Companies,에너지,Oil & Gas Storage & Transportation,정유·에너지,0.13,Y,N
+WTW,Willis Towers Watson,금융,Insurance Brokers,보험,0.04,Y,N
+WDAY,Workday,정보기술,Application Software,소프트웨어,0.07,Y,Y
+WYNN,Wynn Resorts,경기소비재,Casinos & Gaming,카지노,0.01,Y,N
+XEL,Xcel Energy,유틸리티,Multi-Utilities,유틸리티,0.07,Y,Y
+XYL,Xylem,산업재,Industrial Machinery & Supplies & Components,기계·자동화,0.03,Y,N
+YUM,Yum! Brands,경기소비재,Restaurants,외식,0.06,Y,N
+ZBRA,Zebra Technologies,정보기술,Electronic Equipment & Instruments,전자부품,0.02,Y,N
+ZBH,Zimmer Biomet,헬스케어,Health Care Equipment,의료기기,0.03,Y,N
+ZTS,Zoetis,헬스케어,Pharmaceuticals,제약·바이오,0.05,Y,N
+SPCX,스페이스X,산업재,Aerospace & Defense,우주항공,,N,Y
+RKLB,로켓랩,산업재,Aerospace & Defense,우주항공,,N,Y
+ASML,ASML,정보기술,Semiconductor Materials & Equipment,반도체 장비,,N,Y
+ARM,Arm,정보기술,Semiconductors,AI 서버 부품,,N,Y
+ALAB,아스테라랩스,정보기술,Semiconductors,AI 서버 부품,,N,Y
+CRWV,코어위브,정보기술,Internet Services & Infrastructure,AI 빅테크,,N,Y
+NBIS,네비우스,정보기술,Internet Services & Infrastructure,AI 빅테크,,N,Y
+SHOP,쇼피파이,정보기술,Application Software,인터넷 플랫폼,,N,Y
+MELI,메르카도리브레,경기소비재,Broadline Retail,인터넷 플랫폼,,N,Y
+PDD,PDD(테무),경기소비재,Broadline Retail,인터넷 플랫폼,,N,Y
+MSTR,스트래티지,정보기술,Application Software,가상자산,,N,Y
+CCEP,코카콜라유로퍼시픽,필수소비재,Soft Drinks & Non-alcoholic Beverages,필수소비재,,N,Y
+TRI,톰슨로이터,산업재,Research & Consulting Services,IT 서비스,,N,Y
+FER,페로비알,산업재,Construction & Engineering,건설,,N,Y
+ALNY,앨나일람,헬스케어,Biotechnology,제약·바이오,,N,Y
