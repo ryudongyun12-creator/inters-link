@@ -91,91 +91,97 @@ CELL_RE = re.compile(r"<t[dh][^>]*>(.*?)</t[dh]>", re.S | re.I)
 TAG_RE = re.compile(r"<[^>]+>")
 DATE_RE = re.compile(r"^(\d{4})[.\-/](\d{2})[.\-/](\d{2})$")
 DIAG = {"done": False}
+FLOW_START = (dt.date.today() - dt.timedelta(days=200)).strftime("%Y%m%d")
+FLOW_END = dt.date.today().strftime("%Y%m%d")
 
 
-def _parse_frgn_rows(html):
-    """네이버 외국인·기관 매매 표를 칸 순서로 읽기.
-    칸: 날짜 | 종가 | 전일비 | 등락률 | 거래량 | 기관 순매매량 | 외국인 순매매량 | 외국인 보유주수 | 외국인 보유율"""
+def _frame(rows, cols):
+    if not rows:
+        return None
+    d = pd.DataFrame(rows, columns=["date"] + cols).drop_duplicates("date").sort_values("date").set_index("date")
+    return d if len(d) > 5 else None
+
+
+def _src_krx(code, requests):
+    """1순위: 한국거래소 투자자별 거래실적(pykrx). 외국인 순매수 금액(원)이 그대로 나옴."""
+    from pykrx import stock
+
+    df = stock.get_market_trading_value_by_date(FLOW_START, FLOW_END, code)
+    if df is None or df.empty:
+        return None, "KRX 0줄"
+    col = next((c for c in df.columns if "외국인" in str(c)), None)
+    if col is None:
+        return None, f"KRX 열 없음 {list(df.columns)[:6]}"
+    rows = [(pd.Timestamp(i).strftime("%Y-%m-%d"), np.nan, float(v) / 1e8, np.nan) for i, v in df[col].items()]
+    return _frame(rows, ["close", "f_val", "f_hold"]), f"KRX {len(rows)}줄"
+
+
+def _src_sisejson(code, requests):
+    """2순위: 네이버 일별 시세 API. 종가와 외국인 지분율(소진율) → 지분율 변화로 외국인 매매를 대신 잼."""
+    url = (f"https://api.finance.naver.com/siseJson.naver?symbol={code}&requestType=1"
+           f"&startTime={FLOW_START}&endTime={FLOW_END}&timeframe=day")
+    r = requests.get(url, headers={**UA, "Referer": "https://finance.naver.com/"}, timeout=20)
+    txt = r.content.decode("utf-8", errors="ignore")
+    if not re.search(r'"\d{8}"', txt):
+        txt = r.content.decode("euc-kr", errors="ignore")
     rows = []
-    for tr in ROW_RE.findall(html):
-        cells = [TAG_RE.sub("", c).replace("&nbsp;", " ").strip() for c in CELL_RE.findall(tr)]
-        if len(cells) >= 9 and DATE_RE.match(cells[0]):
-            y, m, d = DATE_RE.match(cells[0]).groups()
-            rows.append((f"{y}-{m}-{d}", _num(cells[1]), _num(cells[6]), _num(cells[8])))
-    return rows
+    for ds, rest in re.findall(r'\[\s*"(\d{8})"\s*,([^\]]*)\]', txt):
+        v = [_num(x) for x in rest.split(",")]
+        if len(v) >= 6:
+            rows.append((f"{ds[:4]}-{ds[4:6]}-{ds[6:]}", v[3], np.nan, v[5]))
+    return _frame(rows, ["close", "f_val", "f_hold"]), f"일별시세API 응답 {r.status_code}, {len(rows)}줄"
 
 
-def _decode(r):
-    for enc in ("euc-kr", "cp949", "utf-8"):
-        try:
-            t = r.content.decode(enc)
-            if DATE_RE.pattern and re.search(r"\d{4}\.\d{2}\.\d{2}", t):
-                return t
-        except Exception:
-            continue
-    return r.content.decode("euc-kr", errors="ignore")
-
-
-def _naver_mobile(code, requests):
-    """두 번째 경로: 네이버 모바일 증권 투자자별 매매(JSON). 키 이름이 바뀌어도 찾도록 느슨하게 읽음."""
-    url = f"https://m.stock.naver.com/api/stock/{code}/trend?pageSize=100"
-    r = requests.get(url, headers={**UA, "Referer": "https://m.stock.naver.com/"}, timeout=20)
-    js = r.json()
-    items = js if isinstance(js, list) else next((v for v in js.values() if isinstance(v, list)), []) if isinstance(js, dict) else []
-    rows = []
-    for it in items:
-        if not isinstance(it, dict):
-            continue
-        keys = {k.lower(): k for k in it}
-        dk = next((keys[k] for k in keys if "bizdate" in k or "tradedat" in k or k == "date"), None)
-        fk = next((keys[k] for k in keys if "foreign" in k and ("pure" in k or "net" in k) and "ratio" not in k), None)
-        hk = next((keys[k] for k in keys if "foreign" in k and ("ratio" in k or "rate" in k)), None)
-        ck = next((keys[k] for k in keys if "close" in k), None)
-        if not (dk and fk and ck):
-            continue
-        ds = re.sub(r"[^0-9]", "", str(it[dk]))[:8]
-        if len(ds) != 8:
-            continue
-        rows.append((f"{ds[:4]}-{ds[4:6]}-{ds[6:]}", _num(it[ck]), _num(it[fk]), _num(it[hk]) if hk else np.nan))
-    return rows
-
-
-def naver_frgn(code, pages=NAVER_PAGES):
-    """네이버 금융 외국인·기관 매매 → DataFrame(index=날짜, close, f_net(주), f_hold(%)). 실패하면 None."""
-    import requests
-
-    rows, how, note = [], "", ""
-    for page in range(1, pages + 1):
+def _src_pc(code, requests):
+    """3순위: 네이버 PC 외국인·기관 매매 페이지. 날짜 칸을 찾고 그 뒤 칸 순서로 읽음."""
+    rows, note = [], ""
+    for page in range(1, NAVER_PAGES + 1):
         url = f"https://finance.naver.com/item/frgn.naver?code={code}&page={page}"
-        try:
-            r = requests.get(url, headers={**UA, "Referer": f"https://finance.naver.com/item/main.naver?code={code}"}, timeout=20)
-            got = _parse_frgn_rows(_decode(r)) if r.status_code == 200 else []
-            if page == 1:
-                note = f"PC 페이지 응답 {r.status_code}, {len(r.content):,}바이트, 1쪽 {len(got)}줄"
-        except Exception as e:
-            got = []
-            if page == 1:
-                note = f"PC 페이지 오류 {type(e).__name__}"
+        r = requests.get(url, headers={**UA, "Referer": f"https://finance.naver.com/item/main.naver?code={code}"}, timeout=20)
+        html = r.content.decode("euc-kr", errors="ignore")
+        if "외국인" not in html:
+            html = r.content.decode("utf-8", errors="ignore")
+        got = []
+        for tr in ROW_RE.findall(html):
+            cells = [TAG_RE.sub("", c).replace("&nbsp;", " ").strip() for c in CELL_RE.findall(tr)]
+            k = next((i for i, c in enumerate(cells) if DATE_RE.match(c)), None)
+            if k is None or len(cells) - k < 9:
+                continue
+            y, m, d = DATE_RE.match(cells[k]).groups()
+            after = cells[k + 1:]
+            close, fnet, hold = _num(after[0]), _num(after[5]), _num(after[7])
+            got.append((f"{y}-{m}-{d}", close, fnet * close / 1e8 if np.isfinite(fnet) else np.nan, hold))
+        if page == 1:
+            title = re.search(r"<title>(.*?)</title>", html, re.S)
+            note = (f"PC 응답 {r.status_code}, {len(r.content):,}바이트, 제목 '{(title.group(1).strip() if title else '')[:30]}', "
+                    f"'외국인' {'있음' if '외국인' in html else '없음'}, 날짜 {len(re.findall(r'\d{4}\.\d{2}\.\d{2}', html))}개, 1쪽 {len(got)}줄")
         if not got:
             break
         rows += got
-        how = "PC"
         time.sleep(0.25)
-    if not rows:
+    return _frame(rows, ["close", "f_val", "f_hold"]), note
+
+
+def korea_flow(code):
+    """외국인 수급(가능하면 시세도): 출처를 차례로 시도. (DataFrame[close, f_val(억 원), f_hold(%)], 출처) 또는 (None, '')"""
+    import requests
+
+    notes = []
+    for name, fn in (("KRX", _src_krx), ("네이버 일별시세", _src_sisejson), ("네이버 PC", _src_pc)):
         try:
-            rows = _naver_mobile(code, requests)
-            how = "모바일" if rows else ""
-            note += f" / 모바일 {len(rows)}줄"
+            d, note = fn(code, requests)
         except Exception as e:
-            note += f" / 모바일 오류 {type(e).__name__}"
+            d, note = None, f"{name} 오류 {type(e).__name__}: {str(e)[:60]}"
+        notes.append(note)
+        if d is not None and (d["f_val"].notna().sum() > 5 or d["f_hold"].notna().sum() > 5):
+            if not DIAG["done"]:
+                log(f"[외국인 수급 진단] {code}: " + " / ".join(notes) + f" → 성공({name})")
+                DIAG["done"] = True
+            return d, name
     if not DIAG["done"]:
-        log(f"[네이버 진단] {code}: {note} → {'성공(' + how + ')' if rows else '실패'}")
+        log(f"[외국인 수급 진단] {code}: " + " / ".join(notes) + " → 실패")
         DIAG["done"] = True
-    if not rows:
-        return None
-    out = pd.DataFrame(rows, columns=["date", "close", "f_net", "f_hold"]).dropna(subset=["close"])
-    out = out.drop_duplicates("date").sort_values("date").set_index("date")
-    return out[["close", "f_net", "f_hold"]] if len(out) else None
+    return None, ""
 
 
 def market_caps(symbols):
@@ -217,19 +223,23 @@ def main():
     caps = market_caps([ysym[r["ticker"]] for r in ndx])
     log(f"나스닥 100 시가총액 {len(caps)}/{len(ndx)}개")
 
-    # 한국: 네이버 금융(시세 + 외국인 순매매) 우선, 받지 못한 종목은 Yahoo(.KS → .KQ)로 시세만
+    # 한국: 외국인 수급은 KRX → 네이버 일별시세 → 네이버 PC 순서로, 시세는 거기서 받거나 Yahoo로
     codes = sorted({r["kr_code"].zfill(6) if r["kr_code"].isdigit() else r["kr_code"] for r in links if r["kr_code"]})
-    kr_close, kr_flow = {}, {}
+    kr_close, kr_flow, srcs = {}, {}, {}
     for k, c in enumerate(codes, start=1):
-        d = naver_frgn(c)
-        if d is not None and len(d) > 5:
-            kr_close[c] = d["close"]
+        d, src = korea_flow(c)
+        if d is not None:
             kr_flow[c] = d
+            srcs[src] = srcs.get(src, 0) + 1
+            if d["close"].notna().sum() > 5:
+                kr_close[c] = d["close"].dropna()
         if k % 25 == 0:
-            log(f"  네이버 {k}/{len(codes)} (시세 {len(kr_close)}, 외국인 {len(kr_flow)})")
+            log(f"  한국 {k}/{len(codes)} (외국인 {len(kr_flow)}, 출처 {srcs})")
+        time.sleep(0.3)
+    log(f"외국인 수급 출처별 종목 수: {srcs or '없음'}")
     left = [c for c in codes if c not in kr_close]
     if left:
-        log(f"네이버에서 못 받은 {len(left)}개는 Yahoo로: {left}")
+        log(f"시세를 Yahoo로 받을 종목 {len(left)}개")
         ypx = download([c + ".KS" for c in left])
         left2 = [c for c in left if c + ".KS" not in ypx]
         ypx.update(download([c + ".KQ" for c in left2]) if left2 else {})
@@ -237,9 +247,21 @@ def main():
             s = ypx.get(c + ".KS", ypx.get(c + ".KQ"))
             if s is not None:
                 kr_close[c] = s
+        # Yahoo에도 없는 종목(새 형식 종목코드 등)은 네이버 일별 시세로
+        import requests
+        for c in [c for c in left if c not in kr_close]:
+            try:
+                d, _ = _src_sisejson(c, requests)
+                if d is not None and d["close"].notna().sum() > 5:
+                    kr_close[c] = d["close"].dropna()
+            except Exception:
+                pass
     kr_ret = pd.DataFrame({c: s.sort_index().pct_change() * 100 for c, s in kr_close.items()})
-    # 외국인 순매수 금액(억 원) = 순매매량 × 종가
-    kr_fval = pd.DataFrame({c: d["f_net"] * d["close"] / 1e8 for c, d in kr_flow.items()}).sort_index()
+    # 외국인 흐름: 순매수 금액(억 원)이 있으면 그것, 없으면 지분율 변화(%p)
+    fser = {}
+    for c, d in kr_flow.items():
+        fser[c] = d["f_val"] if d["f_val"].notna().sum() > 5 else d["f_hold"].diff()
+    kr_fval = pd.DataFrame(fser).sort_index()
     log(f"한국 시세 {kr_ret.shape[1]}/{len(codes)}개, 외국인 {len(kr_flow)}개, 시세 못 받은 종목코드: {[c for c in codes if c not in kr_close]}")
     if us_ret.empty or kr_ret.empty:
         raise RuntimeError("시세를 받지 못했습니다.")
@@ -286,11 +308,11 @@ def main():
     # 종목별 외국인 요약 (가장 최근 한국 마감까지)
     fsum = {}
     for c, d in kr_flow.items():
-        v = kr_fval[c].dropna() if c in kr_fval else pd.Series(dtype=float)
+        v = d["f_val"].dropna()
         h = d["f_hold"].dropna()
         fsum[c] = (v.iloc[-1] if len(v) else np.nan, v.iloc[-5:].sum() if len(v) else np.nan,
                    h.iloc[-1] if len(h) else np.nan, (h.iloc[-1] - h.iloc[-6]) if len(h) >= 6 else np.nan)
-    f_date = max((d.index[-1] for d in kr_flow.values()), default=None)
+    f_date = max((d.dropna(how="all", subset=["f_val", "f_hold"]).index[-1] for d in kr_flow.values()), default=None)
     us_last = {t: us_ret.at[d_us, t] for t in us_ret.columns}
     link_rows = []
     for i, r in enumerate(links, start=1):
