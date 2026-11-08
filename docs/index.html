@@ -183,7 +183,7 @@ body { background: var(--color-bg); color: var(--color-fg); font-family: var(--f
       <div class="lk-scale" aria-label="연계 강도">연계 강도 강함 <span class="lk-badge lk-rel-5">공급망</span><span class="lk-badge lk-rel-4">업황 공유</span><span class="lk-badge lk-rel-3">투자 수혜</span><span class="lk-badge lk-rel-2">정책·테마</span><span class="lk-badge lk-rel-1">판매 채널</span><span class="lk-badge lk-rel-0">같은 섹터</span> 약함</div>
       <div class="lk-tablebox">
         <table class="lk-table" id="links-table" data-source="kr_links" data-row-key="link_id">
-          <thead><tr><th data-field="kr_name">한국 종목</th><th data-field="relation">연계 방식</th><th data-field="expected_pct" class="lk-num">예상 반응(<span data-draw="next-kr-short" data-source="meta" data-field="next_kr_date">—</span>)</th><th data-field="corr" class="lk-num">상관계수</th><th data-field="hit_rate" class="lk-num">방향 일치율</th><th data-field="beta" class="lk-num">반응 배율</th><th data-field="f_corr" class="lk-num">외국인 연동</th><th data-field="f_net_5d" class="lk-num">외국인 5일(억원)</th><th data-field="note">설명</th><th data-field="basis">근거</th></tr></thead>
+          <thead><tr><th data-field="kr_name">한국 종목</th><th data-field="relation">연계 방식</th><th data-field="expected_pct" class="lk-num">예상 반응(<span data-draw="next-kr-short" data-source="meta" data-field="next_kr_date">—</span>)</th><th data-field="corr" class="lk-num">상관계수</th><th data-field="hit_rate" class="lk-num">방향 일치율</th><th data-field="beta" class="lk-num">반응 배율</th><th data-field="f_corr" class="lk-num">외국인 연동</th><th data-field="f_net_5d" class="lk-num">외국인 5일</th><th data-field="note">설명</th><th data-field="basis">근거</th></tr></thead>
           <tbody data-draw="links"></tbody>
         </table>
       </div>
@@ -231,7 +231,7 @@ body { background: var(--color-bg); color: var(--color-fg); font-family: var(--f
       <li>측정 기간은 미국 거래일 기준 <b data-draw="win-start" data-source="meta" data-field="window_start">—</b>부터 <b data-draw="win-end" data-source="meta" data-field="window_end">—</b>까지이며, 한국 휴장일이 겹친 날은 빠집니다. 시세를 받지 못한 종목은 빈칸입니다.</li>
       <li><b>갱신 방식</b>: 미장이 마감하면 지도 색, 예상 반응, 추천 테마가 그 미장 기준으로 새로 바뀝니다. 국장이 마감하면 전일 미장과 그날 국장 한 쌍이 60일 상관계수에 더해질 뿐 화면 기준은 그대로입니다.</li>
       <li><b>외국인 연동</b>: 미국 종목이 오른 날 다음 한국 거래일에 외국인이 그 한국 종목을 순매수한 정도(상관계수)입니다. 높을수록 "미장 상승 → 외국인 매수 → 국장 상승" 경로가 실제로 작동해 온 종목입니다.</li>
-      <li><b>외국인 5일</b>: 가장 최근 한국 마감까지 5거래일 동안의 외국인 순매수 금액(순매매량 × 종가, 억 원)입니다. 네이버 금융 기준이며 당일 값은 잠정치일 수 있습니다.</li>
+      <li><b>외국인 5일</b>: 가장 최근 한국 마감까지 5거래일 동안의 외국인 순매수 금액(억 원, 한국거래소 기준)입니다. 금액을 받지 못한 종목은 같은 기간 외국인 지분율 변화(%p, 네이버 금융 기준)로 표시합니다.</li>
       <li><b>추천 테마</b>: 미장 상승폭과 국장 연동이 함께 큰 섹터입니다. 과거 60일 평균으로 고른 참고 목록이라 실제 국장이 반대로 갈 수 있습니다.</li>
     </ul>
     <p class="lk-note">근거 열에서 소모임 자료는 인터즈 종목 선정 소모임 요약본, 기사는 이번에 확인한 기사입니다. 같은 업종과 추론은 업종과 흐름으로 묶은 것이라 직접 확인이 필요합니다. 동아리 내부 학습용이며 투자 권유가 아닙니다.</p>
@@ -378,8 +378,10 @@ dash.calc('theme_reco', {
         theme, kind, us_avg, n_us: priced.length, kr_corr, score: Math.round(us_avg * kr_corr * 100) / 100,
         exp_avg: picks.length ? Math.round(mean(picks.map((l) => Number(l.expected_pct))) * 100) / 100 : null,
         picks: picks.map((l) => l.kr_name + ' ' + (Number(l.expected_pct) > 0 ? '+' : '') + Number(l.expected_pct).toFixed(2) + '%'
-          + (ok(l.f_net_5d) ? ' (외 ' + (Number(l.f_net_5d) > 0 ? '+' : '') + Math.round(Number(l.f_net_5d)).toLocaleString() + '억)' : '')).join(' | '),
+          + (ok(l.f_net_5d) ? ' (외 ' + (Number(l.f_net_5d) > 0 ? '+' : '') + Math.round(Number(l.f_net_5d)).toLocaleString() + '억)'
+             : ok(l.f_hold_chg5) ? ' (외 ' + (Number(l.f_hold_chg5) > 0 ? '+' : '') + Number(l.f_hold_chg5).toFixed(2) + '%p)' : '')).join(' | '),
         f_corr, f_net_5d: picks.some((l) => ok(l.f_net_5d)) ? Math.round(picks.reduce((a, l) => a + (ok(l.f_net_5d) ? Number(l.f_net_5d) : 0), 0)) : null,
+        f_hold_chg5: picks.some((l) => ok(l.f_hold_chg5)) ? Math.round(mean(picks.filter((l) => ok(l.f_hold_chg5)).map((l) => Number(l.f_hold_chg5))) * 100) / 100 : null,
         lead_ticker: lead.ticker, lead_change: Number(lead.change_pct), reason: t.reason || '', reason_source: t.reason_source || '',
       });
     });
@@ -450,6 +452,16 @@ function cplCell(v) {
   td.appendChild(sp);
   return td;
 }
+function flowText(net, hold) {
+  if (num(net) !== null) return (num(net) > 0 ? '+' : '') + Math.round(num(net)).toLocaleString() + '억';
+  if (num(hold) !== null) return (num(hold) > 0 ? '+' : '') + num(hold).toFixed(2) + '%p';
+  return '—';
+}
+function flowSign(net, hold) { return num(net) !== null ? Math.sign(num(net)) : num(hold) !== null ? Math.sign(num(hold)) : 0; }
+function flowCell(r) {
+  const sg = flowSign(r.f_net_5d, r.f_hold_chg5);
+  return cell(flowText(r.f_net_5d, r.f_hold_chg5), 'lk-num' + (sg > 0 ? ' up' : sg < 0 ? ' down' : ''));
+}
 function cell(text, cls) { const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = text; return td; }
 
 // ───── 한 줄 요약 ─────
@@ -485,8 +497,9 @@ function recoCards(el, kind, max) {
     const top = document.createElement('div'); top.className = 'lk-reco-top';
     const nm = document.createElement('span'); nm.className = 'lk-reco-name'; nm.textContent = r.theme;
     const rk = document.createElement('span'); rk.className = 'lk-reco-rank'; rk.textContent = (i + 1) + '위';
-    const fOk = num(r.f_corr) !== null && r.f_corr >= LK_F_CORR && num(r.f_net_5d) !== null;
-    if (fOk && ((kind === '추천' && r.f_net_5d > 0) || (kind === '주의' && r.f_net_5d < 0))) {
+    const fs = flowSign(r.f_net_5d, r.f_hold_chg5);
+    const fOk = num(r.f_corr) !== null && r.f_corr >= LK_F_CORR && fs !== 0;
+    if (fOk && ((kind === '추천' && fs > 0) || (kind === '주의' && fs < 0))) {
       const bd = document.createElement('span'); bd.className = 'lk-fbadge' + (kind === '주의' ? ' is-sell' : '');
       bd.textContent = kind === '주의' ? '외국인 매도 확인' : '외국인 확인'; nm.appendChild(bd);
     }
@@ -497,7 +510,7 @@ function recoCards(el, kind, max) {
       item('예상 반응', r.exp_avg === null ? '—' : pct(r.exp_avg), r.exp_avg > 0 ? 'up' : r.exp_avg < 0 ? 'down' : ''),
       item('대표', r.lead_ticker + ' ' + pct(r.lead_change)),
       item('외국인 연동', num(r.f_corr) === null ? '—' : num(r.f_corr).toFixed(2)),
-      item('외국인 5일', num(r.f_net_5d) === null ? '—' : (r.f_net_5d > 0 ? '+' : '') + Math.round(r.f_net_5d).toLocaleString() + '억', r.f_net_5d > 0 ? 'up' : r.f_net_5d < 0 ? 'down' : ''));
+      item('외국인 5일', flowText(r.f_net_5d, r.f_hold_chg5), flowSign(r.f_net_5d, r.f_hold_chg5) > 0 ? 'up' : flowSign(r.f_net_5d, r.f_hold_chg5) < 0 ? 'down' : ''));
     b.append(top, st);
     if (r.reason) { const w = document.createElement('p'); w.className = 'lk-reco-why'; w.textContent = r.reason + (r.reason_source ? ' (' + r.reason_source + ')' : ''); b.appendChild(w); }
     if (r.picks) {
@@ -768,7 +781,7 @@ dash.draw('links', (tb) => {
         cell(num(r.hit_rate) === null ? '—' : Math.round(num(r.hit_rate)) + '%', 'lk-num'),
         cell(num(r.beta) === null ? '—' : num(r.beta).toFixed(2), 'lk-num'),
         cplCell(r.f_corr),
-        cell(num(r.f_net_5d) === null ? '—' : (num(r.f_net_5d) > 0 ? '+' : '') + Math.round(num(r.f_net_5d)).toLocaleString(), 'lk-num' + (num(r.f_net_5d) > 0 ? ' up' : num(r.f_net_5d) < 0 ? ' down' : '')),
+        flowCell(r),
         cell(r.note),
         cell(r.basis, 'lk-basis'),
       );
