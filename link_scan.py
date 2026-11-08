@@ -86,48 +86,96 @@ def _num(x):
         return np.nan
 
 
+ROW_RE = re.compile(r"<tr[^>]*>(.*?)</tr>", re.S | re.I)
+CELL_RE = re.compile(r"<t[dh][^>]*>(.*?)</t[dh]>", re.S | re.I)
+TAG_RE = re.compile(r"<[^>]+>")
+DATE_RE = re.compile(r"^(\d{4})[.\-/](\d{2})[.\-/](\d{2})$")
+DIAG = {"done": False}
+
+
+def _parse_frgn_rows(html):
+    """네이버 외국인·기관 매매 표를 칸 순서로 읽기.
+    칸: 날짜 | 종가 | 전일비 | 등락률 | 거래량 | 기관 순매매량 | 외국인 순매매량 | 외국인 보유주수 | 외국인 보유율"""
+    rows = []
+    for tr in ROW_RE.findall(html):
+        cells = [TAG_RE.sub("", c).replace("&nbsp;", " ").strip() for c in CELL_RE.findall(tr)]
+        if len(cells) >= 9 and DATE_RE.match(cells[0]):
+            y, m, d = DATE_RE.match(cells[0]).groups()
+            rows.append((f"{y}-{m}-{d}", _num(cells[1]), _num(cells[6]), _num(cells[8])))
+    return rows
+
+
+def _decode(r):
+    for enc in ("euc-kr", "cp949", "utf-8"):
+        try:
+            t = r.content.decode(enc)
+            if DATE_RE.pattern and re.search(r"\d{4}\.\d{2}\.\d{2}", t):
+                return t
+        except Exception:
+            continue
+    return r.content.decode("euc-kr", errors="ignore")
+
+
+def _naver_mobile(code, requests):
+    """두 번째 경로: 네이버 모바일 증권 투자자별 매매(JSON). 키 이름이 바뀌어도 찾도록 느슨하게 읽음."""
+    url = f"https://m.stock.naver.com/api/stock/{code}/trend?pageSize=100"
+    r = requests.get(url, headers={**UA, "Referer": "https://m.stock.naver.com/"}, timeout=20)
+    js = r.json()
+    items = js if isinstance(js, list) else next((v for v in js.values() if isinstance(v, list)), []) if isinstance(js, dict) else []
+    rows = []
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        keys = {k.lower(): k for k in it}
+        dk = next((keys[k] for k in keys if "bizdate" in k or "tradedat" in k or k == "date"), None)
+        fk = next((keys[k] for k in keys if "foreign" in k and ("pure" in k or "net" in k) and "ratio" not in k), None)
+        hk = next((keys[k] for k in keys if "foreign" in k and ("ratio" in k or "rate" in k)), None)
+        ck = next((keys[k] for k in keys if "close" in k), None)
+        if not (dk and fk and ck):
+            continue
+        ds = re.sub(r"[^0-9]", "", str(it[dk]))[:8]
+        if len(ds) != 8:
+            continue
+        rows.append((f"{ds[:4]}-{ds[4:6]}-{ds[6:]}", _num(it[ck]), _num(it[fk]), _num(it[hk]) if hk else np.nan))
+    return rows
+
+
 def naver_frgn(code, pages=NAVER_PAGES):
-    """네이버 금융 외국인·기관 매매 표 → DataFrame(index=날짜, close, f_net(주), f_hold(%)). 실패하면 None."""
+    """네이버 금융 외국인·기관 매매 → DataFrame(index=날짜, close, f_net(주), f_hold(%)). 실패하면 None."""
     import requests
 
-    frames = []
+    rows, how, note = [], "", ""
     for page in range(1, pages + 1):
         url = f"https://finance.naver.com/item/frgn.naver?code={code}&page={page}"
         try:
-            r = requests.get(url, headers=UA, timeout=20)
-            html = r.content.decode("euc-kr", errors="ignore")
-            tables = pd.read_html(io.StringIO(html))
-        except Exception:
+            r = requests.get(url, headers={**UA, "Referer": f"https://finance.naver.com/item/main.naver?code={code}"}, timeout=20)
+            got = _parse_frgn_rows(_decode(r)) if r.status_code == 200 else []
+            if page == 1:
+                note = f"PC 페이지 응답 {r.status_code}, {len(r.content):,}바이트, 1쪽 {len(got)}줄"
+        except Exception as e:
+            got = []
+            if page == 1:
+                note = f"PC 페이지 오류 {type(e).__name__}"
+        if not got:
             break
-        found = None
-        for t in tables:
-            cols = [" ".join(str(c) for c in (col if isinstance(col, tuple) else (col,))) for col in t.columns]
-            if any("날짜" in c for c in cols) and any("외국인" in c and "순매매" in c for c in cols):
-                t = t.copy()
-                t.columns = cols
-                found = t
-                break
-        if found is None:
-            break
-        dcol = next(c for c in found.columns if "날짜" in c)
-        ccol = next(c for c in found.columns if "종가" in c)
-        fcol = next(c for c in found.columns if "외국인" in c and "순매매" in c)
-        hcol = next((c for c in found.columns if "보유율" in c), None)
-        d = pd.DataFrame({
-            "date": pd.to_datetime(found[dcol].astype(str).str.strip(), format="%Y.%m.%d", errors="coerce"),
-            "close": found[ccol].map(_num),
-            "f_net": found[fcol].map(_num),
-            "f_hold": found[hcol].map(_num) if hcol else np.nan,
-        }).dropna(subset=["date", "close"])
-        if d.empty:
-            break
-        frames.append(d)
+        rows += got
+        how = "PC"
         time.sleep(0.25)
-    if not frames:
+    if not rows:
+        try:
+            rows = _naver_mobile(code, requests)
+            how = "모바일" if rows else ""
+            note += f" / 모바일 {len(rows)}줄"
+        except Exception as e:
+            note += f" / 모바일 오류 {type(e).__name__}"
+    if not DIAG["done"]:
+        log(f"[네이버 진단] {code}: {note} → {'성공(' + how + ')' if rows else '실패'}")
+        DIAG["done"] = True
+    if not rows:
         return None
-    out = pd.concat(frames).drop_duplicates("date").sort_values("date")
-    out.index = out["date"].dt.strftime("%Y-%m-%d")
-    return out[["close", "f_net", "f_hold"]]
+    out = pd.DataFrame(rows, columns=["date", "close", "f_net", "f_hold"]).dropna(subset=["close"])
+    out = out.drop_duplicates("date").sort_values("date").set_index("date")
+    return out[["close", "f_net", "f_hold"]] if len(out) else None
 
 
 def market_caps(symbols):
